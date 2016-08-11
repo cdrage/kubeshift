@@ -1,0 +1,22 @@
+# Travis CI checks for atomicapp
+
+language: python
+sudo: required
+
+python:
+  - "2.7"
+
+before_install:
+  - sudo pip install pytest-cov coveralls pep8 flake8
+
+install:
+  - sudo make install
+
+before_script:
+  - sudo make syntax-check
+
+script:
+  - sudo make test
+
+after_success:
+  - sudo coveralls
