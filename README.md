@@ -49,3 +49,10 @@ import kubeshift
 a = kubeshift.Client(kubeshift.Config.from_file("/home/user/.kube/config"), "kubernetes")
 a.namespaces()
 ```
+
+## TODO
+
+ - Better documentation
+ - Additional providers other than Kubernetes and OpenShift
+ - Simpler import-from-kube-config-file functionality
+ - Certificate data fixes
