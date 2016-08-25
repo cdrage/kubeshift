@@ -1,6 +1,6 @@
 # Kubeshift
 [![Build Status](https://travis-ci.org/cdrage/kubeshift.svg?branch=master)](https://travis-ci.org/cdrage/kubeshift)
-[![Coverage Status](https://coveralls.io/repos/cdrage/kubeshift/badge.svg?branch=master&service=github)](https://coveralls.io/github/cdrage/kubeshift?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/cdrage/kubeshift/badge.svg?branch=master)](https://coveralls.io/github/cdrage/kubeshift?branch=master)
 
 ## Introduction
 
