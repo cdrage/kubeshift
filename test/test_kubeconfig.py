@@ -22,6 +22,9 @@ class TestKubeConfParsing(unittest.TestCase):
     def test_from_params(self):
         Config.from_params("foo", "bar", "foo", "bar")
 
+    def test_from_params_with_verification(self):
+        Config.from_params("foo", "bar", "foo", False)
+
     def test_parse_kubeconf_from_file_failure(self):
         _, tmpfilename = tempfile.mkstemp()
         f = open(tmpfilename, 'w')
@@ -158,6 +161,44 @@ class TestKubeConfParsing(unittest.TestCase):
 
         self.assertRaises(ProviderFailedException,
                           Config.parse_kubeconf_data, kubecfg_data)
+
+    def test_parse_kubeconf_failure(self):
+        """
+        Test parsing kubeconf data with missing context data for
+        current context.
+        """
+
+        kubecfg_data = {
+            'current-context': 'context2',
+            'contexts': [
+                {
+                    'name': 'context1',
+                }
+            ],
+            'clusters': [
+                {
+                    'name': 'cluster1',
+                    'cluster': {
+                        'server': 'server1'
+                    }
+                }
+            ],
+            'users': [
+                {
+                    'name': 'user1',
+                    'user': {
+                        'token': 'token1'
+                    }
+                }
+            ]
+        }
+
+        _, tmpfilename = tempfile.mkstemp()
+        f = open(tmpfilename, 'w')
+        f.write(str(kubecfg_data))
+        f.close()
+        self.assertRaises(ProviderFailedException,
+                          Config.parse_kubeconf, tmpfilename)
 
     def test_parse_kubeconf_data_no_user(self):
         """
