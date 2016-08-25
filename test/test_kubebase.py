@@ -1,6 +1,6 @@
 import pytest
 from kubeshift.base import KubeBase
-from kubeshift.exceptions import KubeConnectionError
+from kubeshift.exceptions import KubeConnectionError, KubeBaseError
 
 
 config = {
@@ -35,6 +35,42 @@ config = {
     ]
 }
 kubebase = KubeBase(config)
+
+
+def test_init_missing_current_context():
+    config = {
+        "kind": "Config",
+        "preferences": {},
+        # "current-context": "dev",
+        "contexts": [
+                {
+                    "name": "dev",
+                    "context": {
+                        "cluster": "dev",
+                        "user": "default"
+                    }
+                }
+        ],
+        "clusters": [
+            {
+                "cluster": {
+                    "server": "http://localhost:8080"
+                },
+                "name": "dev"
+            }
+        ],
+        "apiVersion": "v1",
+        "users": [
+            {
+                "name": "default",
+                "user": {
+                        "token": "foobar"
+                }
+            }
+        ]
+    }
+    with pytest.raises(KubeBaseError):
+        KubeBase(config)
 
 
 def test_get_resources(httpserver):
