@@ -1,0 +1,5 @@
+flake8
+mock
+pep8
+pytest-cov
+pytest-localserver

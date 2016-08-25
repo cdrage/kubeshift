@@ -13,6 +13,7 @@ install:
 .PHONY: test
 test:
 	pip install -qr requirements.txt
+	pip install -qr test-requirements.txt
 	$(PYTHON) -m pytest test/ -vv --cov kubeshift 
 
 .PHONY: syntax-check
