@@ -142,6 +142,7 @@ class KubeBase(object):
         if not outfile:
             return ''.join(results)
 
+    # TODO: Need to future-proof for v2 API releases
     def get_groups(self, url):
         '''
         Get the groups of APIs available.

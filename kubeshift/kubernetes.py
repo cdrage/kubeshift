@@ -43,6 +43,7 @@ class KubeKubernetesClient(object):
         # Gather the group names from which resource names will be derived
         self.k8s_api_groups = self.api.get_groups(self.k8s_apis)
 
+        # TODO: Needs to be future-proof for v2 API, not just extensions/v1beta1, etc.
         for (name, versions) in self.k8s_api_groups:
             for version in versions:
                 api = "%s/%s" % (name, version)
