@@ -3,7 +3,6 @@ import websocket
 import tempfile
 import base64
 import ssl
-from requests.exceptions import SSLError
 from kubeshift.exceptions import KubeBaseError, KubeConnectionError
 import logging
 logger = logging.getLogger()
@@ -89,6 +88,9 @@ class KubeBase(object):
             res = self._request_method(method, url, data)
             status_code = res.status_code
             return_data = res.json()
+        except requests.exceptions.SSLError:
+            msg = "SSL/TLS ERROR: invalid certificate"
+            raise KubeConnectionError(msg)
         except requests.exceptions.ConnectTimeout:
             msg = "Timeout when connecting to  %s" % url
             raise KubeConnectionError(msg)
@@ -98,8 +100,6 @@ class KubeBase(object):
         except requests.exceptions.ConnectionError:
             msg = "Refused connection to %s" % url
             raise KubeConnectionError(msg)
-        except SSLError:
-            raise KubeConnectionError("SSL/TLS ERROR: invalid certificate")
         except ValueError:
             return_data = None
 
@@ -111,6 +111,12 @@ class KubeBase(object):
                                       % (status_code, return_data))
         return return_data
 
+    # TODO:
+    # This function DOES NOT WORK at the moment
+    # Error out gracefully on missing CA
+    # NOT require CA all the time
+    # fix CERT_REQUIRED functionality for 'run_forever' function
+    # grab certificate_ca NOT cert_ca
     def websocket_request(self, url, outfile=None):
         '''
         Due to the requests library not supporting SPDY, websocket(s) are required
