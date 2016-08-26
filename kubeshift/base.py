@@ -212,9 +212,7 @@ class KubeBase(object):
         if singular.endswith(("s", "x", "z", "ch", "sh")):
             plural = singular + "es"
         else:
-            if singular[-1] == "s":
-                plural = singular
-            elif singular[-1] == "y":
+            if singular[-1] == "y":
                 plural = singular.rstrip("y") + "ies"
             else:
                 plural = singular + "s"
