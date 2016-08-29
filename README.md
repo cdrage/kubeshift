@@ -24,6 +24,12 @@ At the moment we support:
 
 ## Library installation
 
+#### Pip
+```
+sudo pip install kubeshift
+```
+
+#### Manual / development
 ```
 git clone https://github.com/cdrage/kubeshift && cd kubeshift
 make install
@@ -31,15 +37,12 @@ make install
 
 ## Python requirements
 
-```
+```sh
+▶ cat requirements.txt 
 anymarkup
 jsonpointer
 requests
 websocket-client
-```
-
-```
-pip install -r requirements.txt
 ```
 
 ## Methods and examples
@@ -86,9 +89,5 @@ a.delete(k8s_object) # Deletes the k8s object
 
 ## TODO
 
- - Upload to pypi
- - 0.0.1 release
- - Better documentation
  - Additional providers other than Kubernetes and OpenShift
- - Simpler import-from-kube-config-file functionality
  - Certificate data fixes
