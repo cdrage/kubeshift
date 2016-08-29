@@ -21,9 +21,9 @@ def _install_requirements():
 setup(
     name='kubeshift',
     version='0.0.1',
-    description='A universal library for container orchestrators',
+    description='A universal python library for container orchestrators',
     author='cdrage',
-    author_email='container-tools@redhat.com',
+    author_email='cdrage@redhat.com',
     url='https://github.com/cdrage/kubeshift',
     license="LGPL3",
     packages=find_packages(),
