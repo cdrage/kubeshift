@@ -1,0 +1,10 @@
+# Examples
+recursive-include examples/ *
+
+# Misc
+include README.md
+include LICENSE
+include requirements.txt
+include test-requirements.txt
+include tox.ini
+include Makefile

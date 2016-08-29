@@ -27,5 +27,7 @@ setup(
     url='https://github.com/cdrage/kubeshift',
     license="LGPL3",
     packages=find_packages(),
-    install_requires=_install_requirements()
+    install_requires=_install_requirements(),
+    keywords=['kubernetes', 'kubeshift', 'openshift', 'docker'],
+    classifiers=[]
 )
