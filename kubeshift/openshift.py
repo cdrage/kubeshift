@@ -126,7 +126,10 @@ class KubeOpenshiftClient(object):
         '''
         url = urljoin(self.oc_api, "projects")
         ns = self.api.request("get", url)
-        return ns['items']
+        namespaces = []
+        for x in ns['items']:
+            namespaces.append(x['metadata']['name'])
+        return namespaces
 
     def _generate_kurl(self, obj, namespace, name=None, params=None):
         '''
