@@ -19,11 +19,10 @@ class KubeBase(object):
     cluster = None
     user = None
     token = None
-    client_certification = None
-    client_key = None
-    certificate_authority_data = None  # Not yet implemented
-    certificate_authority = None
-    certificate_ca = None  # Not yet implemented
+    client_certificate = None  # user: client-certificate in .kube/config
+    client_key = None  # user: client-key in .kube/config
+    certificate_authority = None  # cluster: certificate-authority
+    certificate_authority_data = None  # cluster: certificate-authority-data
     insecure_skip_tls_verify = False
 
     def __init__(self, config):
@@ -49,6 +48,15 @@ class KubeBase(object):
         if "certificate-authority" in self.cluster:
             self.certificate_authority = self.cluster["certificate-authority"]
 
+        # As per github.com/kubernetes/kubernetes/blob/master/pkg/client/unversioned/clientcmd/api/v1/types.go#L67
+        # -data contains PEM-encoded data and overrides certificate-authority
+        if "certificate-authority-data" in self.cluster:
+            self.certificate_authority = self.cert_file(
+                self.cluster["certificate-authority-data"],
+                "certificate-authority-data"
+            )
+
+        # Gather whether or not to skip tls verification
         if "insecure-skip-tls-verify" in self.cluster:
             self.insecure_skip_tls_verify = self.cluster["insecure-skip-tls-verify"]
 
@@ -64,7 +72,7 @@ class KubeBase(object):
                 self.token = self.user['token']
 
             if "client-certificate" in self.user:
-                self.client_certification = self.user['client-certificate']
+                self.client_certificate = self.user['client-certificate']
 
             if "client-key" in self.user:
                 self.client_key = self.user['client-key']
@@ -116,7 +124,6 @@ class KubeBase(object):
     # Error out gracefully on missing CA
     # NOT require CA all the time
     # fix CERT_REQUIRED functionality for 'run_forever' function
-    # grab certificate_ca NOT cert_ca
     def websocket_request(self, url, outfile=None):
         '''
         Due to the requests library not supporting SPDY, websocket(s) are required
@@ -135,7 +142,7 @@ class KubeBase(object):
             on_message=lambda ws, message: self._handle_exec_reply(ws, message, results, outfile))
 
         ws.run_forever(sslopt={
-            'ca_certs': self.cert_ca if self.cert_ca is not None else ssl.CERT_NONE,
+            'ca_certs': self.certificate_authority if self.certificate_authority is not None else ssl.CERT_NONE,
             'cert_reqs': ssl.CERT_REQUIRED if self.insecure_skip_tls_verify else ssl.CERT_NONE})
 
         # If an outfile was not provided, return the results in its entirety
@@ -290,9 +297,9 @@ class KubeBase(object):
 
         # Lastly, if we have client-certificate and client-key in the .kube/config
         # we add them to the connection as a cert
-        if self.client_certification and self.client_key:
+        if self.client_certificate and self.client_key:
             connection.cert = (
-                self.cert_file(self.client_certification, "client-certificate"),
+                self.cert_file(self.client_certificate, "client-certificate"),
                 self.cert_file(self.client_key, "client-key")
             )
 
