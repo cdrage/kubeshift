@@ -118,7 +118,7 @@ class FakeClientWithNamespaces():
         return {}
 
     def request(self, method, url, data=None):
-        return {'items': [{'foo': 'bar'}]}
+        return {'items': [{'metadata': {'name': 'foo'}}]}
 
     @property
     def cluster(self):
