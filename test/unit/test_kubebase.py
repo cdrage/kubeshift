@@ -89,12 +89,20 @@ def test_config_with_certificate_and_skip_tls():
     assert a.insecure_skip_tls_verify == "true"
 
 
+def test_config_with_certificate_authority_data_override():
+    mod_config = deepcopy(config)
+    mod_config['clusters'][0]['cluster']['certificate-authority'] = "/foo/bar/key.pem"
+    mod_config['clusters'][0]['cluster']['certificate-authority-data'] = "/foo/bar/key-data.pem"
+    a = KubeBase(mod_config)
+    assert a.certificate_authority == "/foo/bar/key-data.pem"
+
+
 def test_config_with_client_key_and_certificate():
     mod_config = deepcopy(config)
     mod_config['users'][0]['user']['client-certificate'] = "/foo/bar/cert.pem"
     mod_config['users'][0]['user']['client-key'] = "/foo/bar/key.pem"
     a = KubeBase(mod_config)
-    assert a.client_certification == "/foo/bar/cert.pem"
+    assert a.client_certificate == "/foo/bar/cert.pem"
     assert a.client_key == "/foo/bar/key.pem"
 
 
