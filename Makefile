@@ -23,6 +23,19 @@ unit-test: test
 
 .PHONE: integration-test
 integration-test: requirements
+	@echo
+	@echo -------------
+	@echo THESE TESTS BRING UP MULTIPLE ORCHESTATOR CLUSTERS
+	@echo TRUNNING WITHIN DOCKER
+	@echo
+	@echo THESE MAY TAKE A WHILE TO RUN
+	@echo
+	@echo REQUIREMENTS:
+	@echo  docker
+	@echo	 kubectl
+	@echo  oc
+	@echo -------------
+	@echo
 	$(PYTHON) -m pytest test/integration -vv
 
 .PHONY: syntax-check
