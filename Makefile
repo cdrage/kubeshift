@@ -3,18 +3,27 @@
 PYTHON ?= /usr/bin/python
 
 .PHONY: all
-all:
-	$(PYTHON) -m pytest -vv
+all: test
 
 .PHONY: install
 install:
 	$(PYTHON) setup.py install
 
-.PHONY: test
-test:
+.PHONY: requirements
+requirements:
 	pip install -qr requirements.txt
 	pip install -qr test-requirements.txt
-	$(PYTHON) -m pytest test/ -vv --cov kubeshift 
+
+.PHONY: test
+test: requirements
+	$(PYTHON) -m pytest test/unit -vv --cov kubeshift 
+
+.PHONY: unit-test
+unit-test: test
+
+.PHONE: integration-test
+integration-test: requirements
+	$(PYTHON) -m pytest test/integration -vv
 
 .PHONY: syntax-check
 syntax-check:
