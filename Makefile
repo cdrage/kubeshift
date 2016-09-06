@@ -15,14 +15,14 @@ requirements:
 	pip install -qr test-requirements.txt
 
 .PHONY: test
-test: requirements
+test:
 	$(PYTHON) -m pytest test/unit -vv --cov kubeshift 
 
 .PHONY: unit-test
 unit-test: test
 
 .PHONE: integration-test
-integration-test: requirements
+integration-test:
 	@echo
 	@echo -------------
 	@echo THESE TESTS BRING UP MULTIPLE ORCHESTATOR CLUSTERS
