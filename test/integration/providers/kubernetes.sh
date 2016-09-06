@@ -55,7 +55,9 @@ config_k8s() {
   cat ~/.kube/config
 
   # Delay due to CI being a bit too slow when first starting k8s
-  sleep 5
+  # TODO: This needs to be more dynamic instead of just waiting 30 seconds...
+  # Could result in false-positives depending on k8s speed on start-up
+  sleep 30
 }
 
 

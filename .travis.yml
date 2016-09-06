@@ -1,12 +1,19 @@
-# Travis CI checks for atomicapp
-
 language: python
 sudo: required
+services:
+  - docker
 
 python:
   - "2.7"
 
 before_install:
+  # kubectl
+  - sudo apt-get install curl -y
+  - curl -O https://storage.googleapis.com/kubernetes-release/release/v1.3.4/bin/linux/amd64/kubectl
+  - chmod +x kubectl
+  - sudo mv kubectl /usr/local/bin/kubectl
+
+  # python
   - sudo pip install pytest-cov coveralls pep8 flake8
 
 install:
@@ -16,7 +23,12 @@ before_script:
   - sudo make syntax-check
 
 script:
-  - sudo make test
+  # install test requirements
+  - sudo make requirements
+
+  # run tests
+  - make test
+  - make integration-test
 
 after_success:
   - sudo coveralls
