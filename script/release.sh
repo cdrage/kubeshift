@@ -200,6 +200,18 @@ push() {
   echo "REMEMBER TO UPDATE DOCKER BUILDS! :D"
 }
 
+upload_pypi_test() {
+  cd $CLI
+  python setup.py sdist upload -r pypitest
+  cd ..
+}
+
+upload_pypi() {
+  cd $CLI
+  python setup.py sdist upload -r pypi
+  cd ..
+}
+
 clean() {
   rm -rf $CLI $CLI-$1 $CLI-$1.tar.gz $CLI-$1.tar.gz.asc changes.txt
 }
@@ -241,6 +253,8 @@ main() {
   "Create PR against kubeshift"
   "Tarball and sign kubeshift - requires gpg key"
   "Upload the tarball and push to Github release page"
+  "Test upload to pypi"
+  "Upload to pypi"
   "Clean"
   "Quit")
   select opt in "${options[@]}"
@@ -267,6 +281,12 @@ main() {
               ;;
           "Upload the tarball and push to Github release page")
               push $VERSION
+              ;;
+          "Test upload to pypi")
+              upload_pypi_test
+              ;;
+          "Upload to pypi")
+              upload_pypi
               ;;
           "Clean")
               clean $VERSION
