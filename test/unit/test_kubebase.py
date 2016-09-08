@@ -231,3 +231,11 @@ def test_cert_file_with_base64_cert():
     base64_data = f.read()
     f.close()
     assert base64_data == "foo"
+
+
+def test_get_metadata_name():
+    k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "helloapache"}}, "spec": {
+        "containers": [{"image": "$image", "name": "helloapache", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
+
+    with pytest.raises(KubeBaseError):
+        KubeBase._get_metadata_name(k8s_object)

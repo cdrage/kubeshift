@@ -2,7 +2,7 @@ import mock
 import pytest
 from copy import deepcopy
 from kubeshift.kubernetes import KubeKubernetesClient
-from kubeshift.exceptions import KubeKubernetesError
+from kubeshift.exceptions import KubeKubernetesError, KubeBaseError
 
 config = {
     "kind": "Config",
@@ -148,7 +148,7 @@ def test_create_with_missing_metadata_name(utest_connection, uget_resources, uge
 
     a = KubeKubernetesClient(config)
 
-    with pytest.raises(KubeKubernetesError):
+    with pytest.raises(KubeBaseError):
         a.create(k8s_object, "foobar")
 
 

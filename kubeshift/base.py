@@ -334,3 +334,25 @@ class KubeBase(object):
             headers = {"Content-Type": "application/json-patch+json"}
             res = self.api.patch(url, json=data, headers=headers)
         return res
+
+    # Openshift + Kubernetes ONLY specific functions
+
+    @staticmethod
+    def _get_metadata_name(obj):
+        '''
+        This looks at the object and grabs the metadata name of said object
+
+        Args:
+            obj (object): Object file of the artifact
+
+        Returns:
+            name (str): Returns the metadata name of the object
+        '''
+        if "metadata" in obj and \
+                "name" in obj["metadata"]:
+            name = obj["metadata"]["name"]
+        else:
+            raise KubeBaseError("Cannot undeploy. There is no"
+                                " name in object metadata "
+                                "object=%s" % obj)
+        return name

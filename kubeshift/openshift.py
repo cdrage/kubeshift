@@ -62,7 +62,7 @@ class KubeOpenshiftClient(object):
         '''
         Create an object from the Kubernetes cluster
         '''
-        name = self._get_metadata_name(obj)
+        name = KubeBase._get_metadata_name(obj)
         kind, url = self._generate_kurl(obj, namespace)
 
         # Must process through each object if kind is a 'template'
@@ -89,7 +89,7 @@ class KubeOpenshiftClient(object):
         https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/garbage-collection.md
 
         '''
-        name = self._get_metadata_name(obj)
+        name = KubeBase._get_metadata_name(obj)
         kind, url = self._generate_kurl(obj, namespace, name)
 
         # Must process through each object if kind is a 'template'
@@ -115,7 +115,7 @@ class KubeOpenshiftClient(object):
         patch = [{"op": "replace",
                   "path": "/spec/replicas",
                   "value": replicas}]
-        name = self._get_metadata_name(obj)
+        name = KubeBase._get_metadata_name(obj)
         _, url = self._generate_kurl(obj, namespace, name)
         self.api.request("patch", url, data=patch)
         logger.info("'%s' successfully scaled to %s", name, replicas)
@@ -175,26 +175,6 @@ class KubeOpenshiftClient(object):
             url = urljoin(url, "?%s" % urlencode(params))
 
         return (resource, url)
-
-    @staticmethod
-    def _get_metadata_name(obj):
-        '''
-        This looks at the object and grabs the metadata name of said object
-
-        Args:
-            obj (object): Object file of the artifact
-
-        Returns:
-            name (str): Returns the metadata name of the object
-        '''
-        if "metadata" in obj and \
-                "name" in obj["metadata"]:
-            name = obj["metadata"]["name"]
-        else:
-            raise KubeOpenshiftError("Cannot undeploy. There is no"
-                                     " name in object metadata "
-                                     "object=%s" % obj)
-        return name
 
     # OPENSHIFT-SPECIFIC FUNCTIONS
 
@@ -295,13 +275,13 @@ class KubeOpenshiftClient(object):
 
         if method is "create":
             for o in data[0]['objects']:
-                name = self._get_metadata_name(o)
+                name = KubeBase._get_metadata_name(o)
                 _, object_url = self._generate_kurl(o, namespace)
                 self.api.request("post", object_url, data=o)
                 logger.debug("Created template object: %s" % name)
         elif method is "delete":
             for o in data[0]['objects']:
-                name = self._get_metadata_name(o)
+                name = KubeBase._get_metadata_name(o)
                 _, object_url = self._generate_kurl(o, namespace, name)
                 self.api.request("delete", object_url)
                 logger.debug("Deleted template object: %s" % name)

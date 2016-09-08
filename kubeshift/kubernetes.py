@@ -54,7 +54,7 @@ class KubeKubernetesClient(object):
         '''
         Create an object from the Kubernetes cluster
         '''
-        name = self._get_metadata_name(obj)
+        name = KubeBase._get_metadata_name(obj)
         kind, url = self._generate_kurl(obj, namespace)
 
         self.api.request("post", url, data=obj)
@@ -77,7 +77,7 @@ class KubeKubernetesClient(object):
         https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/garbage-collection.md
 
         '''
-        name = self._get_metadata_name(obj)
+        name = KubeBase._get_metadata_name(obj)
         kind, url = self._generate_kurl(obj, namespace, name)
 
         if kind in ['rcs', 'replicationcontrollers']:
@@ -99,7 +99,7 @@ class KubeKubernetesClient(object):
         patch = [{"op": "replace",
                   "path": "/spec/replicas",
                   "value": replicas}]
-        name = self._get_metadata_name(obj)
+        name = KubeBase._get_metadata_name(obj)
         _, url = self._generate_kurl(obj, namespace, name)
         self.api.request("patch", url, data=patch)
         logger.info("'%s' successfully scaled to %s", name, replicas)
@@ -159,23 +159,3 @@ class KubeKubernetesClient(object):
             url = urljoin(url, "?%s" % urlencode(params))
 
         return (resource, url)
-
-    @staticmethod
-    def _get_metadata_name(obj):
-        '''
-        This looks at the object and grabs the metadata name of said object
-
-        Args:
-            obj (object): Object file of the artifact
-
-        Returns:
-            name (str): Returns the metadata name of the object
-        '''
-        if "metadata" in obj and \
-                "name" in obj["metadata"]:
-            name = obj["metadata"]["name"]
-        else:
-            raise KubeKubernetesError("Cannot undeploy. There is no"
-                                      " name in object metadata "
-                                      "object=%s" % obj)
-        return name
