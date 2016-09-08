@@ -119,11 +119,6 @@ class KubeBase(object):
                                       % (status_code, return_data))
         return return_data
 
-    # TODO:
-    # This function DOES NOT WORK at the moment
-    # Error out gracefully on missing CA
-    # NOT require CA all the time
-    # fix CERT_REQUIRED functionality for 'run_forever' function
     def websocket_request(self, url, outfile=None):
         '''
         Due to the requests library not supporting SPDY, websocket(s) are required
