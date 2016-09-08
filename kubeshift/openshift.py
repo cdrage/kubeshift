@@ -1,13 +1,8 @@
-import datetime
-import time
-import os
-import tarfile
 import logging
 import re
 
 from urlparse import urljoin
 from urllib import urlencode
-from kubeshift.utils import Utils
 from kubeshift.base import KubeBase
 from kubeshift.exceptions import KubeOpenshiftError
 
@@ -176,99 +171,6 @@ class KubeOpenshiftClient(object):
 
         return (resource, url)
 
-    # OPENSHIFT-SPECIFIC FUNCTIONS
-
-    def extract(self, image, src, dest, namespace, update=True):
-        """
-        Extract contents of a container image from 'src' in container
-        to 'dest' in host.
-
-        Args:
-            image (str): Name of container image
-            src (str): Source path in container
-            dest (str): Destination path in host
-            update (bool): Update existing destination, if True
-        """
-        if os.path.exists(dest) and not update:
-            return
-        cleaned_image_name = Utils.sanitizeName(image)
-        pod_name = '{}-{}'.format(cleaned_image_name, Utils.getUniqueUUID())
-        container_name = cleaned_image_name
-
-        # Pull (if needed) image and bring up a container from it
-        # with 'sleep 3600' entrypoint, just to extract content from it
-        artifact = {
-            'apiVersion': 'v1',
-            'kind': 'Pod',
-            'metadata': {
-                'name': pod_name
-            },
-            'spec': {
-                'containers': [
-                    {
-                        'image': image,
-                        'command': [
-                            'sleep',
-                            '3600'
-                        ],
-                        'imagePullPolicy': 'IfNotPresent',
-                        'name': container_name
-                    }
-                ],
-                'restartPolicy': 'Always'
-            }
-        }
-
-        self.create(artifact, namespace)
-        try:
-            self._wait_till_pod_runs(namespace, pod_name, timeout=300)
-
-            # Archive content from the container and dump it to tmpfile
-            tmpfile = '/tmp/atomicapp-{pod}.tar.gz'.format(pod=pod_name)
-
-            self._execute(
-                namespace, pod_name, container_name,
-                'tar -cz --directory {} ./'.format('/' + src),
-                outfile=tmpfile
-            )
-        finally:
-            # Delete created pod
-            self.delete(artifact, namespace)
-
-        # Extract archive data
-        tar = tarfile.open(tmpfile, 'r:gz')
-        tar.extractall(dest)
-
-    def _execute(self, namespace, pod, container, command,
-                 outfile=None):
-        """
-        Execute a command in a container in an Openshift pod.
-
-        Args:
-            namespace (str): Namespace
-            pod (str): Pod name
-            container (str): Container name inside pod
-            command (str): Command to execute
-            outfile (str): Path to output file where results should be dumped
-
-        Returns:
-            Command output (str) or None in case results dumped to output file
-        """
-        args = {
-            'token': self.api.token,
-            'namespace': namespace,
-            'pod': pod,
-            'container': container,
-            'command': ''.join(['command={}&'.format(word) for word in command.split()])
-        }
-        url = urljoin(
-            self.k8s_api,
-            'namespaces/{namespace}/pods/{pod}/exec?'
-            'access_token={token}&container={container}&'
-            '{command}stdout=1&stdin=0&tty=0'.format(**args))
-
-        return self.api.websocket_request(url, outfile)
-
     def _process_template(self, obj, namespace, method):
         _, url = self._generate_kurl(obj, namespace)
         data = self.api.request("post", url, data=obj)
@@ -289,61 +191,3 @@ class KubeOpenshiftClient(object):
             raise KubeOpenshiftError("No method by that name to process template")
 
         logger.debug("Processed object template successfully")
-
-    def _get_pod_status(self, namespace, pod):
-        """
-        Get pod status.
-
-        Args:
-            namespace (str): Openshift namespace
-            pod (str): Pod name
-
-        Returns:
-            Status of pod (str)
-
-        Raises:
-            ProviderFailedException when unable to fetch Pod status.
-        """
-        args = {
-            'namespace': namespace,
-            'pod': pod,
-            'access_token': self.api.token
-        }
-        url = urljoin(
-            self.k8s_api,
-            'namespaces/{namespace}/pods/{pod}?'
-            'access_token={access_token}'.format(**args))
-        data = self.api.request("get", url)
-
-        return data['status']['phase'].lower()
-
-    def _wait_till_pod_runs(self, namespace, pod, timeout=300):
-        """
-        Wait till pod runs, with a timeout.
-
-        Args:
-            namespace (str): Openshift namespace
-            pod (str): Pod name
-            timeout (int): Timeout in seconds.
-
-        Raises:
-            ProviderFailedException on timeout or when the pod goes to
-            failed state.
-        """
-        now = datetime.datetime.now()
-        timeout_delta = datetime.timedelta(seconds=timeout)
-        while datetime.datetime.now() - now < timeout_delta:
-            status = self.oc.get_pod_status(namespace, pod)
-            if status == 'running':
-                break
-            elif status == 'failed':
-                raise KubeOpenshiftError(
-                    'Unable to run pod for extracting content: '
-                    '{namespace}/{pod}'.format(namespace=namespace,
-                                               pod=pod))
-            time.sleep(1)
-        if status != 'running':
-            raise KubeOpenshiftError(
-                'Timed out to extract content from pod: '
-                '{namespace}/{pod}'.format(namespace=namespace,
-                                           pod=pod))

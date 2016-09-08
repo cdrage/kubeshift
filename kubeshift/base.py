@@ -1,8 +1,6 @@
 import requests
-import websocket
 import tempfile
 import base64
-import ssl
 from kubeshift.exceptions import KubeBaseError, KubeConnectionError
 import logging
 logger = logging.getLogger()
@@ -118,44 +116,6 @@ class KubeBase(object):
             raise KubeConnectionError("Unable to complete request: Status: %s, Error: %s"
                                       % (status_code, return_data))
         return return_data
-
-    def websocket_request(self, url, outfile=None):
-        '''
-        Due to the requests library not supporting SPDY, websocket(s) are required
-        to communicate to the API.
-
-        Args:
-            url (str): URL of the API
-            outfile (str): path of the outfile/data.
-        '''
-        url = 'wss://' + url.split('://', 1)[-1]
-        logger.debug('Converted http to wss url: %s', url)
-        results = []
-
-        ws = websocket.WebSocketApp(
-            url,
-            on_message=lambda ws, message: self._handle_ws_reply(ws, message, results, outfile))
-
-        ws.run_forever(sslopt={
-            'ca_certs': self.certificate_authority if self.certificate_authority is not None else ssl.CERT_NONE,
-            'cert_reqs': ssl.CERT_REQUIRED if self.insecure_skip_tls_verify else ssl.CERT_NONE})
-
-        # If an outfile was not provided, return the results in its entirety
-        if not outfile:
-            return ''.join(results)
-
-    def _handle_ws_reply(self, ws, message, results, outfile=None):
-        """
-        Handle websocket reply messages for each exec call
-        """
-        # FIXME: For some reason, we do not know why,  we need to ignore the
-        # 1st char of the message, to generate a meaningful result
-        cleaned_msg = message[1:]
-        if outfile:
-            with open(outfile, 'ab') as f:
-                f.write(cleaned_msg)
-        else:
-            results.append(cleaned_msg)
 
     # TODO: Need to future-proof for v2 API releases
     def get_groups(self, url):

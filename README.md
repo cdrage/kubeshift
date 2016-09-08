@@ -40,9 +40,7 @@ make install
 ```sh
 ▶ cat requirements.txt 
 anymarkup
-jsonpointer
 requests
-websocket-client
 ```
 
 ## Methods and examples
