@@ -129,3 +129,9 @@ class FakeClientWithNamespaces():
 def test_client_namespaces_with_kubernetes(mock_class):
     mock_class.return_value = FakeClientWithNamespaces()
     Client(config, "kubernetes").namespaces()
+
+
+@mock.patch("kubeshift.openshift.KubeBase")
+def test_client_namespaces_with_openshift(mock_class):
+    mock_class.return_value = FakeClientWithNamespaces()
+    Client(config, "openshift").namespaces()
