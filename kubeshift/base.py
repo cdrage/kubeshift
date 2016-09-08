@@ -139,7 +139,7 @@ class KubeBase(object):
 
         ws = websocket.WebSocketApp(
             url,
-            on_message=lambda ws, message: self._handle_exec_reply(ws, message, results, outfile))
+            on_message=lambda ws, message: self._handle_ws_reply(ws, message, results, outfile))
 
         ws.run_forever(sslopt={
             'ca_certs': self.certificate_authority if self.certificate_authority is not None else ssl.CERT_NONE,
@@ -148,6 +148,19 @@ class KubeBase(object):
         # If an outfile was not provided, return the results in its entirety
         if not outfile:
             return ''.join(results)
+
+    def _handle_ws_reply(self, ws, message, results, outfile=None):
+        """
+        Handle websocket reply messages for each exec call
+        """
+        # FIXME: For some reason, we do not know why,  we need to ignore the
+        # 1st char of the message, to generate a meaningful result
+        cleaned_msg = message[1:]
+        if outfile:
+            with open(outfile, 'ab') as f:
+                f.write(cleaned_msg)
+        else:
+            results.append(cleaned_msg)
 
     # TODO: Need to future-proof for v2 API releases
     def get_groups(self, url):
@@ -304,19 +317,6 @@ class KubeBase(object):
             )
 
         return connection
-
-    def _handle_ws_reply(self, ws, message, results, outfile=None):
-        """
-        Handle websocket reply messages for each exec call
-        """
-        # FIXME: For some reason, we do not know why,  we need to ignore the
-        # 1st char of the message, to generate a meaningful result
-        cleaned_msg = message[1:]
-        if outfile:
-            with open(outfile, 'ab') as f:
-                f.write(cleaned_msg)
-        else:
-            results.append(cleaned_msg)
 
     def _request_method(self, method, url, data):
         '''
