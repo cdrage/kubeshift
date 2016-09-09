@@ -86,5 +86,4 @@ client.delete(k8s_object) # Deletes the k8s object
 
 ## TODO
 
- - Additional providers other than Kubernetes and OpenShift
  - Filtering + retrieving information
