@@ -52,14 +52,13 @@ The configuration file used with the provider must be an _object_. Currently we 
 ```python
 import kubeshift
 
-# Import the configuration, this can be either from file
+# Import the configuration, this can be either from a file
 config = kubeshift.Config.from_file("/home/user/.kube/config")
+client = kubeshift.Client(config, "kubernetes")
 
 # Or generated via a set of parameters
 config_params = kubeshift.Config.from_params(api="https://localhost:8080", auth="foobar", ca="/home/user/.kube/ca.cert", verify=True)
-
-a = kubeshift.Client(config, "kubernetes")
-a.namespaces()
+client = kubeshift.Client(config_params, "kubernetes")
 ```
 
 #### Implemented methods
@@ -72,19 +71,20 @@ The current methods implement for each provider are:
 ```python
 import kubeshift
 
-config = kubeshift.Config.from_file("/home/user/.kube/config")
-
-a = kubeshift.Client(config, "kubernetes")
-
-a.namespaces() # Returns a dict of all available namespaces
-
+# Example k8s object
 k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "helloapache"}, "name": "helloapache"}, "spec": {"containers": [{"image": "nginx", "name": "helloapache", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
 
-a.create(k8s_object) # Creates the k8s object
+# Client configuration
+config = kubeshift.Config.from_file("/home/user/.kube/config")
+client = kubeshift.Client(config, "kubernetes")
 
-a.delete(k8s_object) # Deletes the k8s object
+# Available methods
+client.namespaces() # Returns a dict of all available namespaces
+client.create(k8s_object) # Creates the k8s object
+client.delete(k8s_object) # Deletes the k8s object
 ```
 
 ## TODO
 
  - Additional providers other than Kubernetes and OpenShift
+ - Filtering + retrieving information
