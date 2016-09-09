@@ -11,8 +11,8 @@ __Features:__
   - 100% HTTP API
   - Auto-parsing of `~/.kube/config`
   - `.kube/config` generation
-  - TLS/Websocket authentication
-  - High test coverage
+  - TLS authentication
+  - 100% test coverage with functional and integration tests
 
 ## Providers
 
