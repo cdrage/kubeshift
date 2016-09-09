@@ -187,7 +187,5 @@ class KubeOpenshiftClient(object):
                 _, object_url = self._generate_kurl(o, namespace, name)
                 self.api.request("delete", object_url)
                 logger.debug("Deleted template object: %s" % name)
-        else:
-            raise KubeOpenshiftError("No method by that name to process template")
 
         logger.debug("Processed object template successfully")
