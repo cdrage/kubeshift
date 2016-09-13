@@ -63,48 +63,57 @@ client = kubeshift.Client(config_params, "kubernetes")
 
 #### Implemented methods
 
-The main methods for each provider are:
-  - .create(object)
-  - .delete(object)
-  - .scale(object)
+**The main methods for each provider are:**
+```
+.create(object)
+.delete(object)
+.scale(object)
+```
 
 API calls are also available via their corresponding method. Each call returns a dictionary object container all information. These methods are created from the list of calls at `http://localhost:8080/apis`. Some calls *require* namespace to be provided. Otherwise, 'default' will be used.
 
-API call methods:
-  - componentstatuses
-  - namespaces
-  - nodes
-  - persistentvolumes
-  - thirdpartyresources
+**API call methods:**
+```
+.componentstatuses
+.namespaces
+.nodes
+.persistentvolumes
+.thirdpartyresources
+```
 
-Namespaced API call methods:
-  - configmaps(namespace="default")
-  - endpoints(namespace="default")
-  - events(namespace="default")
-  - limitranges(namespace="default")
-  - persistentvolumeclaims(namespace="default")
-  - pods(namespace="default")
-  - podtemplates(namespace="default")
-  - resourcequotas(namespace="default")
-  - secrets(namespace="default")
-  - serviceaccounts(namespace="default")
-  - services(namespace="default")
-  - daemonsets(namespace="default")
-  - deployments(namespace="default")
-  - horizontalpodautoscalers(namespace="default")
-  - ingresses(namespace="default")
-  - jobs(namespace="default")
-  - networkpolicies(namespace="default")
-  - replicasets(namespace="default")
-  - petsets(namespace="default")
-  - poddisruptionbudgets(namespace="default")
+**Namespaced API call methods:**
+```
+.configmaps(namespace="default")
+.endpoints(namespace="default")
+.events(namespace="default")
+.limitranges(namespace="default")
+.persistentvolumeclaims(namespace="default")
+.pods(namespace="default")
+.podtemplates(namespace="default")
+.resourcequotas(namespace="default")
+.secrets(namespace="default")
+.serviceaccounts(namespace="default")
+.services(namespace="default")
+.daemonsets(namespace="default")
+.deployments(namespace="default")
+.horizontalpodautoscalers(namespace="default")
+.ingresses(namespace="default")
+.jobs(namespace="default")
+.networkpolicies(namespace="default")
+.replicasets(namespace="default")
+.petsets(namespace="default")
+.poddisruptionbudgets(namespace="default")
+```
 
-These API calls can further filtered via these methods:
-  - .filter(namespace="foo", status="Running")
-  - .all()
-  - .metadata()
-  - .items()
+**These API calls can further filtered via these methods:**
+```
+.filter(namespace="foo", status="Running")
+.all()
+.metadata()
+.items()
+```
 
+**Full example:**
 ```python
 import kubeshift
 import getpass
