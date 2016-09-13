@@ -1,17 +1,27 @@
-import getpass
 import kubeshift
+import getpass
 
+# Example k8s object
+k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "helloapache"}, "name": "helloapache"}, "spec": {
+    "containers": [{"image": "nginx", "name": "helloapache", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
+
+# Client configuration
 user = getpass.getuser()
+config = kubeshift.Config.from_file("/home/%s/.kube/config" % user)
+client = kubeshift.Client(config, "kubernetes")
 
-client = kubeshift.Client(kubeshift.Config.from_file("/home/%s/.kube/config" % user), "kubernetes")
+# Main methods
+client.create(k8s_object)  # Creates the k8s object
+# client.scale(k8s_object, replicas=3) # Scales the k8s object (if it's a service)
+client.delete(k8s_object)  # Deletes the k8s object
 
-# Print out all available namespaces
-print client.namespaces()
+# API calls
 
-k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "hellonginx"}, "name": "hellonginx"}, "spec": {"containers": [{"image": "nginx", "name": "hellonginx", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
+# Namespaces
+client.namespaces()
 
-# Create the object
-client.create(k8s_object)
-
-# Delete the object
-# client.delete(k8s_object)
+# Pods
+client.pods().all()
+client.pods().filter(namespace="default", status="Running")
+client.pods().metadata()
+client.pods().items()

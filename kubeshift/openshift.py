@@ -1,9 +1,11 @@
 import logging
 import re
+import inspect
 
 from urlparse import urljoin
 from urllib import urlencode
 from kubeshift.base import KubeBase
+from kubeshift.api import Api
 from kubeshift.exceptions import KubeOpenshiftError
 
 logger = logging.getLogger()
@@ -23,13 +25,13 @@ class KubeOpenshiftClient(object):
         self.api = KubeBase(config)
 
         # Check the API url
-        url = self.api.cluster['server']
-        if not re.match('(?:http|https)://', url):
+        self.base_url = self.api.cluster['server']
+        if not re.match('(?:http|https)://', self.base_url):
             raise KubeOpenshiftError("OpenShift API URL does not include HTTP or HTTPS")
 
         # Gather what end-points we will be using
-        self.k8s_api = urljoin(url, "api/v1/")
-        self.oc_api = urljoin(url, "oapi/v1/")
+        self.k8s_api = urljoin(self.base_url, "api/v1/")
+        self.oc_api = urljoin(self.base_url, "oapi/v1/")
 
         # Test the connection before proceeding
         self.api.test_connection(self.k8s_api)
@@ -42,7 +44,7 @@ class KubeOpenshiftClient(object):
         # TODO: refactor this (create function in kubebase.py)
         self.k8s_api_resources = {}
         self.k8s_api_resources['v1'] = self.api.get_resources(self.k8s_api)
-        self.k8s_apis = urljoin(url, "apis/")
+        self.k8s_apis = urljoin(self.base_url, "apis/")
 
         # Gather the group names from which resource names will be derived
         self.k8s_api_groups = self.api.get_groups(self.k8s_apis)
@@ -115,17 +117,6 @@ class KubeOpenshiftClient(object):
         self.api.request("patch", url, data=patch)
         logger.info("'%s' successfully scaled to %s", name, replicas)
 
-    def namespaces(self):
-        '''
-        Gathers a list of namespaces on the Kubernetes cluster
-        '''
-        url = urljoin(self.oc_api, "projects")
-        ns = self.api.request("get", url)
-        namespaces = []
-        for x in ns['items']:
-            namespaces.append(x['metadata']['name'])
-        return namespaces
-
     def _generate_kurl(self, obj, namespace, name=None, params=None):
         '''
         Generate the required URL by extracting the 'kind' from the
@@ -189,3 +180,190 @@ class KubeOpenshiftClient(object):
                 logger.debug("Deleted template object: %s" % name)
 
         logger.debug("Processed object template successfully")
+
+    # API CALLS
+
+    # v1
+
+    def componentstatuses(self):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3])
+
+    def configmaps(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def endpoints(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def events(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def limitranges(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def namespaces(self):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3])
+
+    def nodes(self):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3])
+
+    def persistentvolumeclaims(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def persistentvolumes(self):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3])
+
+    def pods(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def podtemplates(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def replicationcontrollers(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def resourcequotas(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def secrets(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def serviceaccounts(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def services(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="v1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    # extensions/v1beta1
+
+    def daemonsets(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="extensions/v1beta1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def deployments(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="extensions/v1beta1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def horizontalpodautoscalers(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="extensions/v1beta1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def ingresses(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="extensions/v1beta1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def jobs(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="extensions/v1beta1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def networkpolicies(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="extensions/v1beta1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def replicasets(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="extensions/v1beta1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    def thirdpartyresources(self):
+        return Api(self.api,
+                   self.base_url,
+                   version="extensions/v1beta1",
+                   endpoint=inspect.stack()[0][3])
+
+    # apps/v1alpha1
+
+    def petsets(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="apps/v1alpha1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
+
+    # policy/v1alpha1
+
+    def poddisruptionbudgets(self, namespace):
+        return Api(self.api,
+                   self.base_url,
+                   version="policy/v1alpha1",
+                   endpoint=inspect.stack()[0][3],
+                   namespace=namespace)
