@@ -63,27 +63,74 @@ client = kubeshift.Client(config_params, "kubernetes")
 
 #### Implemented methods
 
-The current methods implement for each provider are:
-  - .namespaces()
+The main methods for each provider are:
   - .create(object)
   - .delete(object)
+  - .scale(object)
+
+API calls are also available via their corresponding method. Each call returns a dictionary object container all information. These methods are created from the list of calls at `http://localhost:8080/apis`. Some calls *require* namespace to be provided. Otherwise, 'default' will be used.
+
+API call methods:
+  - componentstatuses
+  - namespaces
+  - nodes
+  - persistentvolumes
+  - thirdpartyresources
+
+Namespaced API call methods:
+  - configmaps(namespace="default")
+  - endpoints(namespace="default")
+  - events(namespace="default")
+  - limitranges(namespace="default")
+  - persistentvolumeclaims(namespace="default")
+  - pods(namespace="default")
+  - podtemplates(namespace="default")
+  - resourcequotas(namespace="default")
+  - secrets(namespace="default")
+  - serviceaccounts(namespace="default")
+  - services(namespace="default")
+  - daemonsets(namespace="default")
+  - deployments(namespace="default")
+  - horizontalpodautoscalers(namespace="default")
+  - ingresses(namespace="default")
+  - jobs(namespace="default")
+  - networkpolicies(namespace="default")
+  - replicasets(namespace="default")
+  - petsets(namespace="default")
+  - poddisruptionbudgets(namespace="default")
+
+These API calls can further filtered via these methods:
+  - .filter(namespace="foo", status="Running")
+  - .all()
+  - .metadata()
+  - .items()
 
 ```python
 import kubeshift
+import getpass
 
 # Example k8s object
-k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "helloapache"}, "name": "helloapache"}, "spec": {"containers": [{"image": "nginx", "name": "helloapache", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
+k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "helloapache"}, "name": "helloapache"}, "spec": {
+    "containers": [{"image": "nginx", "name": "helloapache", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
 
 # Client configuration
-config = kubeshift.Config.from_file("/home/user/.kube/config")
+user = getpass.getuser()
+config = kubeshift.Config.from_file("/home/%s/.kube/config" % user)
 client = kubeshift.Client(config, "kubernetes")
 
-# Available methods
-client.namespaces() # Returns a dict of all available namespaces
-client.create(k8s_object) # Creates the k8s object
-client.delete(k8s_object) # Deletes the k8s object
+# Main methods
+client.create(k8s_object)  # Creates the k8s object
+# client.scale(k8s_object, replicas=3) # Scales the k8s object (if it's a service)
+client.delete(k8s_object)  # Deletes the k8s object
+
+# API calls
+
+# Namespaces
+client.namespaces()
+
+# Pods
+client.pods().all()
+client.pods().filter(namespace="default", status="Running")
+client.pods().metadata()
+client.pods().items()
 ```
-
-## TODO
-
- - Filtering + retrieving information

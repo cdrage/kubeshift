@@ -31,7 +31,7 @@ class TestKubernetes(unittest.TestCase):
         subprocess.call("./test/integration/providers/kubernetes.sh wait", shell=True)
 
     def test_namespaces(self):
-        assert self.client.namespaces() == ['default', 'kube-system']
+        self.client.namespaces().all()
 
     def test_create_and_delete(self):
         k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "hellonginx"}, "name": "hellonginx"}, "spec": {"containers": [{"image": "nginx", "name": "hellonginx", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
@@ -43,3 +43,31 @@ class TestKubernetes(unittest.TestCase):
         self.client.create(k8s_object)
         with pytest.raises(kubeshift.exceptions.KubeConnectionError):
             self.client.create(k8s_object)
+
+    def test_api_calls(self):
+        calls = ['componentstatuses',
+                 'endpoints',
+                 'events',
+                 'limitranges',
+                 'namespaces',
+                 'nodes',
+                 'persistentvolumeclaims',
+                 'persistentvolumes',
+                 'pods',
+                 'podtemplates',
+                 'resourcequotas',
+                 'secrets',
+                 'serviceaccounts',
+                 'services',
+                 'daemonsets',
+                 'deployments',
+                 'horizontalpodautoscalers',
+                 'ingresses',
+                 'jobs',
+                 'networkpolicies',
+                 'replicasets',
+                 'thirdpartyresources',
+                 'petsets',
+                 'poddisruptionbudgets']
+        for a in calls:
+            print getattr(self.client, a)().all()

@@ -126,12 +126,39 @@ class FakeClientWithNamespaces():
 
 
 @mock.patch("kubeshift.kubernetes.KubeBase")
-def test_client_namespaces_with_kubernetes(mock_class):
-    mock_class.return_value = FakeClientWithNamespaces()
-    Client(config, "kubernetes").namespaces()
-
-
 @mock.patch("kubeshift.openshift.KubeBase")
-def test_client_namespaces_with_openshift(mock_class):
-    mock_class.return_value = FakeClientWithNamespaces()
-    Client(config, "openshift").namespaces()
+def test_client_api_calls(mock_k8s_class, mock_oc_class):
+    mock_k8s_class.return_value = FakeClientWithNamespaces()
+    mock_oc_class.return_value = FakeClientWithNamespaces()
+
+    k8s = Client(config, "kubernetes")
+    oc = Client(config, "openshift")
+
+    calls = ['componentstatuses',
+             'configmaps',
+             'endpoints',
+             'events',
+             'limitranges',
+             'namespaces',
+             'nodes',
+             'persistentvolumeclaims',
+             'persistentvolumes',
+             'pods',
+             'podtemplates',
+             'resourcequotas',
+             'secrets',
+             'serviceaccounts',
+             'services',
+             'daemonsets',
+             'deployments',
+             'horizontalpodautoscalers',
+             'ingresses',
+             'jobs',
+             'networkpolicies',
+             'replicasets',
+             'thirdpartyresources',
+             'petsets',
+             'poddisruptionbudgets']
+    for a in calls:
+        getattr(k8s, a)()
+        getattr(oc, a)()
