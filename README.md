@@ -67,7 +67,7 @@ client = kubeshift.Client(config_params, "kubernetes")
 ```
 .create(object)
 .delete(object)
-.scale(object)
+.scale(object, namespace="default", replicas=0)
 ```
 
 API calls are also available via their corresponding method. Each call returns a dictionary object container all information. These methods are created from the list of calls at `http://localhost:8080/apis`. Some calls *require* namespace to be provided. Otherwise, 'default' will be used.
@@ -105,7 +105,7 @@ API calls are also available via their corresponding method. Each call returns a
 .poddisruptionbudgets(namespace="default")
 ```
 
-**These API calls can further filtered via these methods:**
+**These API calls can further be filtered via these methods:**
 ```
 .filter(namespace="foo", status="Running")
 .all()
