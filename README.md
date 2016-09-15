@@ -4,7 +4,7 @@
 
 ## Introduction
 
-_Kubeshift_ is a multi-provider Python library for container orchestrators. We connect and communicate with each container orchestator 100% through their TLS (if available) HTTP API.
+_Kubeshift_ is a multi-provider Python library for Kubernetes (Kube) and Openshift (shift). We connect and communicate with each container orchestator 100% through their TLS (if available) HTTP API.
 
 __Features:__
 
@@ -13,14 +13,6 @@ __Features:__
   - `.kube/config` generation
   - TLS authentication
   - 100% test coverage with functional and integration tests
-
-## Providers
-
-At the moment we support:
-
-  - Kubernetes
-  - OpenShift
-  - Mesos (soon!)
 
 ## Library installation
 
