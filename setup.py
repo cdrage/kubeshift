@@ -20,7 +20,7 @@ def _install_requirements():
 
 setup(
     name='kubeshift',
-    version='0.0.3',
+    version='0.0.4',
     description='A universal python library for container orchestrators',
     author='cdrage',
     author_email='cdrage@redhat.com',
