@@ -3,7 +3,7 @@ UPSTREAM_REPO="cdrage"
 CLI="kubeshift"
 
 usage() {
-  echo "This will prepare Kubeshift for release!"
+  echo "This will prepare $CLI for release!"
   echo ""
   echo "Requirements:"
   echo " git"
@@ -13,8 +13,7 @@ usage() {
   echo " GITHUB_TOKEN in your env variable"
   echo " "
   echo "Not only that, but you must have permission for:"
-  echo " Tagging releases for Atomic App on Github"
-  echo " Access to hub.docker.com builds"
+  echo " Tagging releases within Github"
   echo ""
 }
 
@@ -95,7 +94,7 @@ changelog_md() {
   cd $CLI
   DATE=$(date +"%m-%d-%Y")
   CHANGELOG=$(cat CHANGELOG.md)
-  HEADER="## Kubeshift $1 ($DATE)"
+  HEADER="## $CLI $1 ($DATE)"
   echo -e "$HEADER\n\n$CHANGES\n\n$CHANGELOG" >CHANGELOG.md
   echo "Changes have been written to CHANGELOG.md"
   cd ..
@@ -220,7 +219,7 @@ main() {
   local cmd=$1
   usage
 
-  echo "What is your Github username? (location of your kubeshift fork)"
+  echo "What is your Github username? (location of your $CLI fork)"
   read ORIGIN_REPO 
   echo "You entered: $ORIGIN_REPO"
   echo ""
@@ -239,8 +238,8 @@ main() {
 
   clear
 
-  echo "Now! It's time to go through each step of releasing Atomic App!"
-  echo "If one of these steps fails / does not work, simply re-run ./kubeshift.sh"
+  echo "Now! It's time to go through each step of releasing $CLI!"
+  echo "If one of these steps fails / does not work, simply re-run ./release.sh"
   echo "Re-enter the information at the beginning and continue on the failed step"
   echo ""
 
@@ -250,8 +249,8 @@ main() {
   "Replace version number"
   "Generate changelog"
   "Generate changelog for release"
-  "Create PR against kubeshift"
-  "Tarball and sign kubeshift - requires gpg key"
+  "Create PR"
+  "Tarball and sign - requires gpg key"
   "Upload the tarball and push to Github release page"
   "Test upload to pypi"
   "Upload to pypi"
@@ -273,10 +272,10 @@ main() {
           "Generate changelog for release")
               changelog_md $VERSION
               ;;
-          "Create PR against kubeshift")
+          "Create PR")
               git_commit $VERSION
               ;;
-          "Tarball and sign kubeshift - requires gpg key")
+          "Tarball and sign - requires gpg key")
               sign $VERSION
               ;;
           "Upload the tarball and push to Github release page")
