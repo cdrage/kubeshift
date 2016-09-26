@@ -1,0 +1,17 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "autoscaling/v1",
+  "resources": [
+    {
+      "name": "horizontalpodautoscalers",
+      "namespaced": true,
+      "kind": "HorizontalPodAutoscaler"
+    },
+    {
+      "name": "horizontalpodautoscalers/status",
+      "namespaced": true,
+      "kind": "HorizontalPodAutoscaler"
+    }
+  ]
+}

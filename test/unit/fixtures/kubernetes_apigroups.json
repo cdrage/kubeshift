@@ -1,0 +1,104 @@
+{
+  "kind": "APIGroupList",
+  "groups": [
+    {
+      "name": "apps",
+      "versions": [
+        {
+          "groupVersion": "apps/v1alpha1",
+          "version": "v1alpha1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "apps/v1alpha1",
+        "version": "v1alpha1"
+      },
+      "serverAddressByClientCIDRs": [
+        {
+          "clientCIDR": "0.0.0.0/0",
+          "serverAddress": "192.168.99.100:8443"
+        }
+      ]
+    },
+    {
+      "name": "authentication.k8s.io",
+      "versions": [
+        {
+          "groupVersion": "authentication.k8s.io/v1beta1",
+          "version": "v1beta1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "authentication.k8s.io/v1beta1",
+        "version": "v1beta1"
+      },
+      "serverAddressByClientCIDRs": [
+        {
+          "clientCIDR": "0.0.0.0/0",
+          "serverAddress": "192.168.99.100:8443"
+        }
+      ]
+    },
+    {
+      "name": "autoscaling",
+      "versions": [
+        {
+          "groupVersion": "autoscaling/v1",
+          "version": "v1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "autoscaling/v1",
+        "version": "v1"
+      },
+      "serverAddressByClientCIDRs": [
+        {
+          "clientCIDR": "0.0.0.0/0",
+          "serverAddress": "192.168.99.100:8443"
+        }
+      ]
+    },
+    {
+      "name": "batch",
+      "versions": [
+        {
+          "groupVersion": "batch/v1",
+          "version": "v1"
+        },
+        {
+          "groupVersion": "batch/v2alpha1",
+          "version": "v2alpha1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "batch/v1",
+        "version": "v1"
+      },
+      "serverAddressByClientCIDRs": [
+        {
+          "clientCIDR": "0.0.0.0/0",
+          "serverAddress": "192.168.99.100:8443"
+        }
+      ]
+    },
+    {
+      "name": "extensions",
+      "versions": [
+        {
+          "groupVersion": "extensions/v1beta1",
+          "version": "v1beta1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "extensions/v1beta1",
+        "version": "v1beta1"
+      },
+      "serverAddressByClientCIDRs": [
+        {
+          "clientCIDR": "0.0.0.0/0",
+          "serverAddress": "192.168.99.100:8443"
+        }
+      ]
+    }
+  ]
+}

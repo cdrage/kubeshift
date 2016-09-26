@@ -1,73 +1,104 @@
+import os
 import unittest
-import subprocess
-import getpass
-import pytest
+
 import kubeshift
+
+
+HELLO_A_POD = {
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "labels": {
+            "app": "hellonginx"
+        },
+        "name": "hellonginx"
+    },
+    "spec": {
+        "containers": [
+            {
+                "image": "nginx",
+                "name": "hellonginx",
+                "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]
+            }
+        ]
+    }
+}
+
+HELLO_B_POD = {
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "labels": {
+            "app": "helloworld"
+        },
+        "name": "helloworld"
+    },
+    "spec": {
+        "containers": [
+            {
+                "image": "nginx",
+                "name": "helloworld",
+                "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]
+            }
+        ]
+    }
+}
+
+KUBE_CONFIG_FILE = os.getenv('KUBE_CONFIG_FILE')
+NAMESPACE = os.getenv('NAMESPACE', 'default')
 
 
 class TestKubernetes(unittest.TestCase):
 
-    # Bring the k8s cluster up (only needs to happen once)
-    @classmethod
-    def setUpClass(cls):
-        subprocess.call("./test/integration/providers/kubernetes.sh start", shell=True)
-        subprocess.call("./test/integration/providers/kubernetes.sh config", shell=True)
-
-    # Tear down the k8s cluster (only needs to happen once)
-    @classmethod
-    def tearDownClass(cls):
-        subprocess.call("./test/integration/providers/kubernetes.sh clean", shell=True)
-        subprocess.call("./test/integration/providers/kubernetes.sh wait", shell=True)
-        subprocess.call("./test/integration/providers/kubernetes.sh stop", shell=True)
-
-    # Setup the client on each function run
     def setUp(self):
-        user = getpass.getuser()
-        self.client = kubeshift.Client(kubeshift.Config.from_file("/home/%s/.kube/config" % user), "kubernetes")
+        cfg = kubeshift.Config.from_file(KUBE_CONFIG_FILE)
+        self.client = kubeshift.KubernetesClient(cfg)
 
-    # Clean the cluster on each function run
     def tearDown(self):
-        subprocess.call("./test/integration/providers/kubernetes.sh clean", shell=True)
-        subprocess.call("./test/integration/providers/kubernetes.sh wait", shell=True)
+        try:
+            self.client.delete(HELLO_A_POD, NAMESPACE)
+        except:
+            pass
 
     def test_namespaces(self):
         self.client.namespaces().all()
 
     def test_create_and_delete(self):
-        k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "hellonginx"}, "name": "hellonginx"}, "spec": {"containers": [{"image": "nginx", "name": "hellonginx", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
-        self.client.create(k8s_object)
-        self.client.delete(k8s_object)
+        self.client.create(HELLO_A_POD, NAMESPACE)
+        self.client.delete(HELLO_A_POD, NAMESPACE)
 
     def test_create_failure(self):
-        k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "hellonginx"}, "name": "hellonginx"}, "spec": {"containers": [{"image": "nginx", "name": "hellonginx", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
-        self.client.create(k8s_object)
-        with pytest.raises(kubeshift.exceptions.KubeConnectionError):
-            self.client.create(k8s_object)
+        self.client.create(HELLO_B_POD, NAMESPACE)
+        with self.assertRaises(kubeshift.exceptions.KubeRequestError):
+            self.client.create(HELLO_B_POD, NAMESPACE)
 
     def test_api_calls(self):
-        calls = ['componentstatuses',
-                 'endpoints',
-                 'events',
-                 'limitranges',
-                 'namespaces',
-                 'nodes',
-                 'persistentvolumeclaims',
-                 'persistentvolumes',
-                 'pods',
-                 'podtemplates',
-                 'resourcequotas',
-                 'secrets',
-                 'serviceaccounts',
-                 'services',
-                 'daemonsets',
-                 'deployments',
-                 'horizontalpodautoscalers',
-                 'ingresses',
-                 'jobs',
-                 'networkpolicies',
-                 'replicasets',
-                 'thirdpartyresources',
-                 'petsets',
-                 'poddisruptionbudgets']
-        for a in calls:
-            print getattr(self.client, a)().all()
+        apis = [
+            'componentstatuses',
+            'configmaps',
+            'endpoints',
+            'events',
+            'limitranges',
+            'namespaces',
+            'nodes',
+            'persistentvolumeclaims',
+            'persistentvolumes',
+            'pods',
+            'podtemplates',
+            'replicationcontrollers',
+            'resourcequotas',
+            'secrets',
+            'serviceaccounts',
+            'services',
+            'daemonsets',
+            'deployments',
+            'horizontalpodautoscalers',
+            'ingresses',
+            'jobs',
+            'networkpolicies',
+            'replicasets',
+            'thirdpartyresources',
+            'petsets',
+        ]
+        for a in apis:
+            self.assertIsNotNone(getattr(self.client, a)().all())

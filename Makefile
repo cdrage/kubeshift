@@ -1,6 +1,9 @@
 # This can be overriden (for eg):
-# make install PYTHON=/usr/bin/python2.7
-PYTHON ?= /usr/bin/python
+ifndef TRAVIS
+	PYTHON ?= $(shell which python)
+else
+	PYTHON ?= /usr/bin/python
+endif
 
 .PHONY: all
 all: test
@@ -11,32 +14,44 @@ install:
 
 .PHONY: requirements
 requirements:
-	pip install -qr requirements.txt
-	pip install -qr test-requirements.txt
+	pip --no-cache-dir install -r requirements.txt
+	pip --no-cache-dir install -r test-requirements.txt
 
 .PHONY: test
 test:
-	$(PYTHON) -m pytest test/unit -vv --cov kubeshift 
+	$(PYTHON) -m pytest test/unit -vv --cov kubeshift
 
 .PHONY: unit-test
 unit-test: test
 
-.PHONE: integration-test
-integration-test:
+.PHONY: cover
+cover: unit-test
+	coverage html
+
+.PHONY: kube-start
+kube-start:
+	./test/integration/providers/kubernetes.sh start
+
+.PHONY: kube-stop
+kube-stop:
+	./test/integration/providers/kubernetes.sh stop
+
+.PHONY: kube-test
+kube-test:
 	@echo
 	@echo -------------
 	@echo THESE TESTS BRING UP MULTIPLE ORCHESTATOR CLUSTERS
-	@echo TRUNNING WITHIN DOCKER
-	@echo
 	@echo THESE MAY TAKE A WHILE TO RUN
 	@echo
 	@echo REQUIREMENTS:
-	@echo  docker
-	@echo	 kubectl
-	@echo  oc
+	@echo 	docker
+	@echo 	kubectl
 	@echo -------------
 	@echo
 	$(PYTHON) -m pytest test/integration -vv
+
+.PHONY: integration-test
+integration-test: kube-start kube-test kube-stop
 
 .PHONY: syntax-check
 syntax-check:
@@ -45,3 +60,6 @@ syntax-check:
 .PHONY: clean
 clean:
 	$(PYTHON) setup.py clean --all
+	rm .coverage || :
+	rm -rf .cache/ || :
+	rm -rf .cover/ || :
