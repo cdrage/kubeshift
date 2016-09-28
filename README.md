@@ -46,11 +46,13 @@ import kubeshift
 
 # Import the configuration, this can be either from a file
 config = kubeshift.Config.from_file("/home/user/.kube/config")
-client = kubeshift.Client(config, "kubernetes")
 
 # Or generated via a set of parameters
-config_params = kubeshift.Config.from_params(api="https://localhost:8080", auth="foobar", ca="/home/user/.kube/ca.cert", verify=True)
-client = kubeshift.Client(config_params, "kubernetes")
+config_params = kubeshift.Config.from_params(context_name="default", username="default", api="https://localhost:8080", auth="foobar", ca="/home/user/.kube/ca.cert", verify=True, filepath=None)
+
+# Client connection
+k8s_client = kubeshift.KubernetesClient(config)
+oc_client = kubeshift.OpenshiftClient(config)
 ```
 
 #### Implemented methods
@@ -111,13 +113,13 @@ import kubeshift
 import getpass
 
 # Example k8s object
-k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "helloapache"}, "name": "helloapache"}, "spec": {
-    "containers": [{"image": "nginx", "name": "helloapache", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
+k8s_object = {"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"app": "hellonginx"}, "name": "hellonginx"}, "spec": {
+    "containers": [{"image": "nginx", "name": "hellonginx", "ports": [{"containerPort": 80, "hostPort": 80, "protocol": "TCP"}]}]}}
 
 # Client configuration
 user = getpass.getuser()
 config = kubeshift.Config.from_file("/home/%s/.kube/config" % user)
-client = kubeshift.Client(config, "kubernetes")
+client = kubeshift.KubernetesClient(config)
 
 # Main methods
 client.create(k8s_object)  # Creates the k8s object
@@ -127,7 +129,7 @@ client.delete(k8s_object)  # Deletes the k8s object
 # API calls
 
 # Namespaces
-client.namespaces()
+client.namespaces().all()
 
 # Pods
 client.pods().all()
