@@ -1,17 +1,15 @@
 #!/bin/bash
 
-start_k8s() {
-  # Note: takes some time for the http server to pop up :)
-  # MINIMUM 15 seconds
+TRAVIS=${TRAVIS:-false}
+
+start_travis_k8s() {
   echo "
   ##########
   STARTING KUBERNETES
   ##########
   "
-  if [ ! -f /usr/bin/kubectl ] && [ ! -f /usr/local/bin/kubectl ]; then
-    echo "No kubectl bin exists? Please install."
-    return 1
-  fi
+
+  hash kubectl 2>/dev/null || { echo "No kubectl bin exists? Please install."; return 1; }
 
   # Use alpha for now since this contains the new hyperkube format going forward
   K8S_VERSION=1.3.4
@@ -42,9 +40,7 @@ start_k8s() {
       echo ...
       sleep 1
   done
-}
 
-config_k8s() {
   # Set the appropriate .kube/config configuration
   kubectl config set-cluster dev --server=http://localhost:8080
   kubectl config set-context dev --cluster=dev --user=default
@@ -52,45 +48,53 @@ config_k8s() {
   kubectl config set-credentials default --token=foobar
 
   # Debug info:
-  cat ~/.kube/config
+  cat ~/.kube/config || :
 
   # Delay due to CI being a bit too slow when first starting k8s
   # TODO: This needs to be more dynamic instead of just waiting 30 seconds...
   # Could result in false-positives depending on k8s speed on start-up
   sleep 30
+
 }
 
+start_local_k8s() {
+  hash minikube 2>/dev/null || { echo "No minikube bin exists? Please install."; return 1; }
+  hash kubectl 2>/dev/null || { echo "No kubectl bin exists? Please install."; return 1; }
 
-stop_k8s() {
+  minikube start
+
+  kubectl config use-context minikube
+
+  kubectl proxy --port=8080 &
+  echo $! > /tmp/kubectl-proxy.pid
+}
+
+start_k8s() {
+  if [[ "${TRAVIS}" == *"true"* ]]
+  then
+    start_travis_k8s
+  else
+    start_local_k8s
+  fi
+}
+
+stop_travis_k8s() {
   echo "
   ##########
   STOPPING KUBERNETES
   ##########
   "
 
-  # Delete via image name google_containers
-  # Delete all containers started (names start with k8s_)
-  # Run twice in-case a container is replicated during that time
-  for run in {0..2}
-  do
-    docker ps -a | grep 'k8s_' | awk '{print $1}' | xargs --no-run-if-empty docker rm -f
-    docker ps -a | grep 'gcr.io/google_containers/hyperkube-amd64' | awk '{print $1}' | xargs --no-run-if-empty docker rm -f
-  done
-}
-
-clean_k8s() {
   # Delete all hanging containers
-  echo "\n-----Cleaning / removing all pods and containers from default namespace-----\n"
+  echo -e "\n-----Cleaning / removing all pods and containers from default namespace-----\n"
   kubectl get pvc,pv,svc,rc,po | grep -v 'k8s-\|NAME\|CONTROLLER\|kubernetes' | awk '{print $1}' | xargs --no-run-if-empty kubectl delete pvc,pv,svc,rc,po --grace-period=1 2>/dev/null
-}
 
-wait_k8s() {
   echo "Waiting for k8s po/svc/rc to finish terminating..."
   kubectl get po,svc,rc
   sleep 3 # give kubectl chance to catch up to api call
-  while [ 1 ]
+  while 'true'
   do
-    k8s=`kubectl get po,svc,rc | grep Terminating`
+    k8s=$(kubectl get po,svc,rc | grep Terminating)
     if [[ $k8s == "" ]]
     then
       echo "k8s po/svc/rc terminated!"
@@ -100,19 +104,37 @@ wait_k8s() {
     fi
     sleep 1
   done
+
+  # Delete via image name google_containers
+  # Delete all containers started (names start with k8s_)
+  # Run twice in-case a container is replicated during that time
+  for _ in {0..2}
+  do
+    docker ps -a | grep 'k8s_' | awk '{print $1}' | xargs --no-run-if-empty docker rm -f
+    docker ps -a | grep 'gcr.io/google_containers/hyperkube-amd64' | awk '{print $1}' | xargs --no-run-if-empty docker rm -f
+  done
 }
 
+stop_local_k8s() {
+  pid=$(cat /tmp/kubectl-proxy.pid)
+  kill "$pid" && rm /tmp/kubectl-proxy.pid
 
-if [[ $1 == "config" ]]; then
-  config_k8s 
-elif [[ $1 == "clean" ]]; then
-  clean_k8s 
-elif [[ $1 == "start" ]]; then
+  minikube stop
+}
+
+stop_k8s() {
+  if [[ "${TRAVIS}" == *"true"* ]]
+  then
+    stop_travis_k8s
+  else
+    stop_local_k8s
+  fi
+}
+
+if [[ $1 == "start" ]]; then
   start_k8s
 elif [[ $1 == "stop" ]]; then
   stop_k8s
-elif [[ $1 == "wait" ]]; then
-  wait_k8s
 else
-  echo $"Usage: kubernetes.sh {config|clean|start|stop|wait}"
+  echo $"Usage: kubernetes.sh {start|stop}"
 fi

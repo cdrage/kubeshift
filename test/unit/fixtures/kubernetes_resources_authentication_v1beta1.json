@@ -1,0 +1,12 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "authentication.k8s.io/v1beta1",
+  "resources": [
+    {
+      "name": "tokenreviews",
+      "namespaced": false,
+      "kind": "TokenReview"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "apps/v1alpha1",
+  "resources": [
+    {
+      "name": "petsets",
+      "namespaced": true,
+      "kind": "PetSet"
+    },
+    {
+      "name": "petsets/status",
+      "namespaced": true,
+      "kind": "PetSet"
+    }
+  ]
+}

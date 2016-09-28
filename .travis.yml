@@ -5,6 +5,8 @@ services:
 
 python:
   - "2.7"
+  - "3.4"
+  - "3.5"
 
 before_install:
   # kubectl
@@ -13,8 +15,7 @@ before_install:
   - chmod +x kubectl
   - sudo mv kubectl /usr/local/bin/kubectl
 
-  # python
-  - sudo pip install pytest-cov coveralls pep8 flake8
+  - sudo make requirements
 
 install:
   - sudo make install
@@ -23,9 +24,6 @@ before_script:
   - sudo make syntax-check
 
 script:
-  # install test requirements
-  - sudo make requirements
-
   # run tests
   - make test
   - make integration-test

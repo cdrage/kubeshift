@@ -1,0 +1,17 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "batch/v2alpha1",
+  "resources": [
+    {
+      "name": "jobs",
+      "namespaced": true,
+      "kind": "Job"
+    },
+    {
+      "name": "jobs/status",
+      "namespaced": true,
+      "kind": "Job"
+    }
+  ]
+}
