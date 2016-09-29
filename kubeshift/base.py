@@ -213,6 +213,7 @@ class KubeBase(_ClientBase, QueryMixin):
     def create(self, obj, namespace=DEFAULT_NAMESPACE):
         """Create an object from the Kubernetes cluster."""
         apiver, kind, name = validator.validate(obj)
+        namespace = validator.check_namespace(obj, namespace)
         url = self._generate_url(apiver, kind, namespace)
 
         self.request('post', url, data=obj)
@@ -235,6 +236,7 @@ class KubeBase(_ClientBase, QueryMixin):
 
         """
         apiver, kind, name = validator.validate(obj)
+        namespace = validator.check_namespace(obj, namespace)
         url = self._generate_url(apiver, kind, namespace, name)
 
         if kind in ['ReplicationController']:
@@ -256,6 +258,7 @@ class KubeBase(_ClientBase, QueryMixin):
             replicates (int): Default 0, size of the amount of replicas to scale
         """
         apiver, kind, name = validator.validate(obj)
+        namespace = validator.check_namespace(obj, namespace)
         url = self._generate_url(apiver, kind, namespace, name)
 
         patch = [{'op': 'replace',
