@@ -48,3 +48,35 @@ class TestValidator(unittest.TestCase):
             validator.check_url('https://localhost:8080')
         except KubeShiftError:
             self.fail('validator.check_url raised KubeShiftError unexpectedly')
+
+    def test_is_valid_ns_none(self):
+        self.assertFalse(validator.is_valid_ns(None))
+        self.assertFalse(validator.is_valid_ns(''))
+
+    def test_is_valid_ns_too_long(self):
+        self.assertFalse(validator.is_valid_ns(
+            'test-name-test-name-test-name-test-name-test-name-test-name-test-name'))
+
+    def test_is_valid_ns_invalid_first_char(self):
+        self.assertFalse(validator.is_valid_ns('_test'))
+        self.assertFalse(validator.is_valid_ns('!test'))
+        self.assertFalse(validator.is_valid_ns('?test'))
+
+    def test_is_valid_ns_invalid_last_char(self):
+        self.assertFalse(validator.is_valid_ns('test_'))
+
+    def test_is_valid_ns_invalid_char(self):
+        self.assertFalse(validator.is_valid_ns('test_namespace'))
+        self.assertFalse(validator.is_valid_ns('test#namespace'))
+
+    def test_is_valid_ns_success(self):
+        self.assertTrue(validator.is_valid_ns('test'))
+        self.assertTrue(validator.is_valid_ns('test-namespace'))
+        self.assertTrue(validator.is_valid_ns('123-test-namespace'))
+
+    def test_check_namespace_failed(self):
+        self.assertEqual(validator.check_namespace({'metadata': {'namespace': '_bad'}}, 'test'), 'test')
+
+    def test_check_namespace_successful(self):
+        self.assertEqual(validator.check_namespace({'metadata': {'namespace': 'test'}}, 'default'), 'test')
+

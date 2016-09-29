@@ -39,3 +39,23 @@ def check_url(url):
     """Verify URL is properly constructed."""
     if not re.match('(?:http|https)://', url):
         raise KubeShiftError('URL does not include HTTP or HTTPS')
+
+
+def is_valid_ns(ns):
+    """Verify namespace format."""
+    valid = True
+    if not ns:
+        valid = False
+    elif len(ns) > 63:
+        valid = False
+    elif not re.match('^[a-z0-9]([-a-z0-9]*[a-z0-9])?$', ns):
+        valid = False
+    return valid
+
+
+def check_namespace(obj, default):
+    """Get namespace from obj and validate."""
+    ns = obj.get('metadata', {}).get('namespace')
+    if is_valid_ns(ns):
+        return ns
+    return default
