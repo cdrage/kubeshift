@@ -508,9 +508,12 @@ class TestConfig(unittest.TestCase):
         self.assertIsNotNone(cfg)
         self.assertEqual(cfg.current_context, 'self')
 
-        cfg._add_cluster({}, 'other')
-        cfg._add_user({}, 'other')
-        cfg._add_context({'cluster': 'other', 'user': 'other'}, 'other')
+        cfg.set_cluster('other')
+        # cfg._add_cluster({}, 'other')
+        # cfg._add_user({}, 'other')
+        cfg.set_credentials('other')
+        # cfg._add_context({'cluster': 'other', 'user': 'other'}, 'other')
+        cfg.set_context('other', cluster='other', user='other')
         cfg.set_current_context('other')
         self.assertEqual('other', cfg.current_context)
 
@@ -552,18 +555,24 @@ class TestConfig(unittest.TestCase):
         cfg = Config.from_params()
 
         orig = copy.deepcopy(cfg.content)
-        cfg._add_cluster({})
-        cfg._add_user({})
-        cfg._add_context({'cluster': 'self', 'user': 'self'})
+        # cfg._add_cluster({})
+        cfg.set_cluster(None)
+        # cfg._add_user({})
+        cfg.set_credentials(None)
+        # cfg._add_context({'cluster': 'self', 'user': 'self'})
+        cfg.set_context(None, cluster='self', user='self')
         cfg.set_current_context('self')
         self.assertEqual(orig, cfg.content)
 
         cfg.set_current_context('other')
         self.assertNotEqual('other', cfg.current_context)
 
-        cfg._add_cluster({}, 'other')
-        cfg._add_user({}, 'other')
-        cfg._add_context({'cluster': 'other', 'user': 'other'}, 'other')
+        cfg.set_cluster('other')
+        # cfg._add_cluster({}, 'other')
+        # cfg._add_user({}, 'other')
+        cfg.set_credentials('other')
+        # cfg._add_context({'cluster': 'other', 'user': 'other'}, 'other')
+        cfg.set_context('other', cluster='other', user='other')
         cfg.set_current_context('other')
         self.assertEqual('other', cfg.current_context)
 
@@ -574,9 +583,12 @@ class TestConfig(unittest.TestCase):
         self.assertNotIn('clusters', cfg.content)
         self.assertNotIn('users', cfg.content)
 
-        cfg._add_cluster({})
-        cfg._add_user({})
-        cfg._add_context({'cluster': 'self', 'user': 'self'})
+        # cfg._add_cluster({})
+        cfg.set_cluster(None)
+        # cfg._add_user({})
+        cfg.set_credentials(None)
+        # cfg._add_context({'cluster': 'self', 'user': 'self'})
+        cfg.set_context(None, cluster='self', user='self')
         cfg.set_current_context('self')
         self.assertIn('contexts', cfg.content)
         self.assertIn('clusters', cfg.content)
@@ -589,23 +601,28 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(len(cfg.content['users']), 1)
 
         # updates default with new value
-        cfg._add_user({'token': 'abc123'})
+        # cfg._add_user({'token': 'abc123'})
+        cfg.set_credentials(None, token='abc123')
         self.assertEqual(len(cfg.content['users']), 1)
 
         # adds a new item to the list
-        cfg._add_user({'token': 'abc123'}, 'other')
+        # cfg._add_user({'token': 'abc123'}, 'other')
+        cfg.set_credentials('other', token='abc123')
         self.assertEqual(len(cfg.content['users']), 2)
 
         # duplicate; does nothing
-        cfg._add_user({'token': 'abc123'})
+        # cfg._add_user({'token': 'abc123'})
+        cfg.set_credentials(None, token='abc123')
         self.assertEqual(len(cfg.content['users']), 2)
 
         # updates default with new value
-        cfg._add_user({'token': 'abc456'})
+        # cfg._add_user({'token': 'abc456'})
+        cfg.set_credentials(None, token='abc456')
         self.assertEqual(len(cfg.content['users']), 2)
 
         # do not erase existing data
-        cfg._add_user({})
+        # cfg._add_user({})
+        cfg.set_credentials(None)
         self.assertEqual(len(cfg.content['users']), 2)
 
         auth = None
@@ -614,6 +631,52 @@ class TestConfig(unittest.TestCase):
                 auth = u['user']
 
         self.assertEqual(auth, {'token': 'abc456'})
+
+    def test_set_cluster(self):
+        cfg = Config(None)
+
+        cfg.set_cluster('test', server='http://localhost:8080', api_version='v2')
+
+        self.assertEqual(cfg.clusters['test'], {'server': 'http://localhost:8080'})
+        self.assertEqual(cfg.content['apiVersion'], 'v2')
+
+        cfg.set_cluster('sample', cert_authority='/tmp/.minikube/ca.crt', embed_certs=True)
+        self.assertIsNotNone(cfg.clusters['sample'].get('certificate-authority'))
+        self.assertIsNotNone(cfg.clusters['sample'].get('certificate-authority-data'))
+
+    def test_set_credentials(self):
+        cfg = Config(None)
+
+        cfg.set_credentials('me', username='admin')
+        self.assertEqual(cfg.users['me'], {'username': 'admin'})
+
+        cfg.set_credentials('me', password='admin')
+        self.assertEqual(cfg.users['me'], {'username': 'admin', 'password': 'admin'})
+
+        session = cfg.format_session()
+        # user is not part of current context
+        self.assertFalse(session.get('headers', {}).get('Authorization', '').startswith('Basic '))
+
+        cfg.set_context(None, user='me')
+        session = cfg.format_session()
+        self.assertTrue(session.get('headers', {}).get('Authorization', '').startswith('Basic '))
+
+        cfg.set_credentials('tester', client_cert='/tmp/.minikube/apiserver.crt',
+                            client_key='/tmp/.minikube/apiserver.key', embed_certs=True)
+
+        self.assertIsNotNone(cfg.users['tester'].get('client-certificate'))
+        self.assertIsNotNone(cfg.users['tester'].get('client-certificate-data'))
+        self.assertIsNotNone(cfg.users['tester'].get('client-key'))
+        self.assertIsNotNone(cfg.users['tester'].get('client-key-data'))
+
+    def test_set_context(self):
+        cfg = Config(None)
+
+        cfg.set_context(None, user='other', use=True)
+        self.assertIsNone(cfg.context.get('user'))
+
+        cfg.set_context(None, namespace='default')
+        self.assertEqual(cfg.context.get('namespace'), 'default')
 
 
 if __name__ == '__main__':
