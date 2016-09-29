@@ -20,7 +20,6 @@ def remove_file(name):
 class TestConfig(unittest.TestCase):
 
     def setUp(self):
-        self.test_configs = []
         try:
             # copy certs to /tmp directory
             shutil.copytree(
@@ -34,9 +33,6 @@ class TestConfig(unittest.TestCase):
         # remove certs from /tmp directory
         shutil.rmtree(os.path.join(tempfile.gettempdir(), '.minikube'), True)
         shutil.rmtree(os.path.dirname(CONFIG_FILE), True)
-
-        for file in self.test_configs:
-            shutil.rmtree(os.path.dirname(file), True)
 
     def test_from_file_none(self):
 
@@ -205,7 +201,7 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(session['verify'].startswith('/tmp/'))
 
         # clean up the test file
-        remove_file(session['verify'])
+        self.addCleanup(remove_file, session['verify'])
 
     def test_format_session_certs_data(self):
 
@@ -224,7 +220,7 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(session['verify'].startswith('/tmp/'))
 
         # clean up the test file
-        remove_file(session['verify'])
+        self.addCleanup(remove_file, session['verify'])
 
     def test_from_params_none(self):
 
@@ -501,7 +497,7 @@ class TestConfig(unittest.TestCase):
 
     def test_from_param_ctx_found(self):
         test_file = '/tmp/.test_kc/config'
-        self.test_configs.append(test_file)
+        self.addCleanup(remove_file, test_file)
 
         cfg = Config.from_params(filepath=test_file)
 
@@ -509,10 +505,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(cfg.current_context, 'self')
 
         cfg.set_cluster('other')
-        # cfg._add_cluster({}, 'other')
-        # cfg._add_user({}, 'other')
         cfg.set_credentials('other')
-        # cfg._add_context({'cluster': 'other', 'user': 'other'}, 'other')
         cfg.set_context('other', cluster='other', user='other')
         cfg.set_current_context('other')
         self.assertEqual('other', cfg.current_context)
@@ -555,11 +548,8 @@ class TestConfig(unittest.TestCase):
         cfg = Config.from_params()
 
         orig = copy.deepcopy(cfg.content)
-        # cfg._add_cluster({})
         cfg.set_cluster(None)
-        # cfg._add_user({})
         cfg.set_credentials(None)
-        # cfg._add_context({'cluster': 'self', 'user': 'self'})
         cfg.set_context(None, cluster='self', user='self')
         cfg.set_current_context('self')
         self.assertEqual(orig, cfg.content)
@@ -568,10 +558,7 @@ class TestConfig(unittest.TestCase):
         self.assertNotEqual('other', cfg.current_context)
 
         cfg.set_cluster('other')
-        # cfg._add_cluster({}, 'other')
-        # cfg._add_user({}, 'other')
         cfg.set_credentials('other')
-        # cfg._add_context({'cluster': 'other', 'user': 'other'}, 'other')
         cfg.set_context('other', cluster='other', user='other')
         cfg.set_current_context('other')
         self.assertEqual('other', cfg.current_context)
@@ -583,11 +570,8 @@ class TestConfig(unittest.TestCase):
         self.assertNotIn('clusters', cfg.content)
         self.assertNotIn('users', cfg.content)
 
-        # cfg._add_cluster({})
         cfg.set_cluster(None)
-        # cfg._add_user({})
         cfg.set_credentials(None)
-        # cfg._add_context({'cluster': 'self', 'user': 'self'})
         cfg.set_context(None, cluster='self', user='self')
         cfg.set_current_context('self')
         self.assertIn('contexts', cfg.content)
@@ -601,27 +585,22 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(len(cfg.content['users']), 1)
 
         # updates default with new value
-        # cfg._add_user({'token': 'abc123'})
         cfg.set_credentials(None, token='abc123')
         self.assertEqual(len(cfg.content['users']), 1)
 
         # adds a new item to the list
-        # cfg._add_user({'token': 'abc123'}, 'other')
         cfg.set_credentials('other', token='abc123')
         self.assertEqual(len(cfg.content['users']), 2)
 
         # duplicate; does nothing
-        # cfg._add_user({'token': 'abc123'})
         cfg.set_credentials(None, token='abc123')
         self.assertEqual(len(cfg.content['users']), 2)
 
         # updates default with new value
-        # cfg._add_user({'token': 'abc456'})
         cfg.set_credentials(None, token='abc456')
         self.assertEqual(len(cfg.content['users']), 2)
 
         # do not erase existing data
-        # cfg._add_user({})
         cfg.set_credentials(None)
         self.assertEqual(len(cfg.content['users']), 2)
 
