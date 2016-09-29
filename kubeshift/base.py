@@ -31,8 +31,7 @@ class _ClientBase(object):
     def __init__(self, config):
         """Establish session using configurations.
 
-        Args:
-            config (object): An object of the .kube/config configuration
+        :param Config config: An object of the .kube/config configuration
         """
         if isinstance(config, dict):
             config = Config(config)
@@ -167,10 +166,10 @@ class _ClientBase(object):
         """
         Complete the request to the API and fails if the status_code is != 200/201.
 
-        Args:
-            method (str): put/get/post/patch
-            url (str): url of the api call
-            data (object): object of the data that is being passed (will be converted to json)
+        :param str method: put/get/post/patch
+        :param str url: url of the api call
+        :param dict data: object of the data that is being passed (will be converted to json)
+        :param dict headers: request header
         """
         status_code = None
         return_data = None
@@ -217,19 +216,17 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         logger.info('%s `%s` successfully created', kind.capitalize(), name)
 
     def delete(self, obj, namespace=DEFAULT_NAMESPACE):
-        """
-        Delete an object from the Kubernetes cluster.
+        """Delete an object from the Kubernetes cluster.
 
-        Args:
-            obj (object): Object of the artifact being modified
-            namesapce (str): Namespace of the kubernetes cluster to be used
+        .. note::
 
-        *Note*
-        Replication controllers must scale to 0 in order to delete pods.
-        Kubernetes 1.3 will implement server-side cascading deletion, but
-        until then, it's mandatory to scale to 0
-        https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/garbage-collection.md
+            Replication controllers must scale to 0 in order to delete pods.
+            Kubernetes 1.3 will implement server-side cascading deletion, but
+            until then, it's mandatory to scale to 0
+            https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/garbage-collection.md
 
+        :param dict obj: Object of the artifact being modified
+        :param str namesapce: Namespace of the kubernetes cluster to be used
         """
         apiver, kind, name = validator.validate(obj)
         namespace = validator.check_namespace(obj, namespace)
@@ -271,16 +268,14 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         logger.info('%s `%s` successfully modified', kind.capitalize(), name)
 
     def scale(self, obj, namespace=DEFAULT_NAMESPACE, replicas=0):
-        """
-        Scale replicas up or down.
+        """Scale replicas up or down.
 
         By default we scale back down to 0. This function takes an object and scales said
         object down to a specified value on the Kubernetes cluster
 
-        Args:
-            obj (object): Object of the artifact being modified
-            namesapce (str): Namespace of the kubernetes cluster to be used
-            replicates (int): Default 0, size of the amount of replicas to scale
+        :param dict obj: Object of the artifact being modified
+        :param str namesapce: Namespace of the kubernetes cluster to be used
+        :param int replicas: Default 0, size of the amount of replicas to scale
         """
         apiver, kind, name = validator.validate(obj)
         namespace = validator.check_namespace(obj, namespace)

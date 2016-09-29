@@ -5,6 +5,10 @@ else
 	PYTHON ?= /usr/bin/python
 endif
 
+
+GH_PAGES_SOURCES = Makefile kubeshift docs README.md requirements.txt test-requirements.txt setup.cfg setup.py .gitignore
+
+
 .PHONY: all
 all: test
 
@@ -57,9 +61,31 @@ integration-test: kube-start kube-test kube-stop
 syntax-check:
 	flake8 kubeshift
 
+.PHONY: docs
+docs:
+	sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
+
+.PHONY: gh-pages
+gh-pages:
+	git checkout gh-pages
+	rm -rf docs/build
+	git checkout master $(GH_PAGES_SOURCES)
+	git reset HEAD
+	make requirements
+	make install
+	make docs
+	mv -fv docs/build/html/* ./
+	rm -rf $(GH_PAGES_SOURCES) docs/build build/ dist/ kubeshift.egg-info/
+	git add -A
+	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
+	git checkout master
+
+
 .PHONY: clean
 clean:
 	$(PYTHON) setup.py clean --all
 	rm .coverage || :
 	rm -rf .cache/ || :
 	rm -rf .cover/ || :
+	rm -rf docs/build || :
+

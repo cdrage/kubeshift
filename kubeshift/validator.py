@@ -7,15 +7,10 @@ from kubeshift.exceptions import KubeShiftError
 def validate(obj):
     """Verify the object has the require attributes.
 
-    Args:
-        obj: an instance of a kubernetes / openshift types.
-
-    Returns:
-        tuple: api_version, kind, name
-
-    Raises:
-        KubeShiftError: if any of the attributes are missing
-
+    :params dict obj: an instance of a kubernetes / openshift types.
+    :returns: apiVersion, kind, name
+    :rtype: tuple
+    :raises kubeshift.exceptions.KubeShiftError: if any of the attributes are missing
     """
     if not obj or not isinstance(obj, dict):
         raise KubeShiftError('Resource object missing or incorrect type')

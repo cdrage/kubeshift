@@ -10,104 +10,104 @@ class KubeQueryMixin(object):
 
     @base.queryapi(version='v1', kind='ComponentStatus', nsarg=False)
     def componentstatuses(self):
-        """Query componentstatuses."""
+        """:py:class:`~kubeshift.queries.base.Query` componentstatuses."""
 
     @base.queryapi(version='v1', kind='ConfigMap')
     def configmaps(self, namespace=DEFAULT_NAMESPACE):
-        """Query configmaps."""
+        """:py:class:`~kubeshift.queries.base.Query` configmaps."""
 
     @base.queryapi(version='v1', kind='Endpoints')
     def endpoints(self, namespace=DEFAULT_NAMESPACE):
-        """Query endpoints."""
+        """:py:class:`~kubeshift.queries.base.Query` endpoints."""
 
     @base.queryapi(version='v1', kind='Event')
     def events(self, namespace=DEFAULT_NAMESPACE):
-        """Query events."""
+        """:py:class:`~kubeshift.queries.base.Query` events."""
 
     @base.queryapi(version='v1', kind='LimitRange')
     def limitranges(self, namespace=DEFAULT_NAMESPACE):
-        """Query limitranges."""
+        """:py:class:`~kubeshift.queries.base.Query` limitranges."""
 
     @base.queryapi(version='v1', kind='Namespace')
     def namespaces(self):
-        """Query namespaces."""
+        """:py:class:`~kubeshift.queries.base.Query` namespaces."""
 
     @base.queryapi(version='v1', kind='Node', nsarg=False)
     def nodes(self):
-        """Query nodes."""
+        """:py:class:`~kubeshift.queries.base.Query` nodes."""
 
     @base.queryapi(version='v1', kind='PersistentVolumeClaim')
     def persistentvolumeclaims(self, namespace=DEFAULT_NAMESPACE):
-        """Query persistentvolumeclaims."""
+        """:py:class:`~kubeshift.queries.base.Query` persistentvolumeclaims."""
 
     @base.queryapi(version='v1', kind='PersistentVolume', nsarg=False)
     def persistentvolumes(self):
-        """Query persistentvolumes."""
+        """:py:class:`~kubeshift.queries.base.Query` persistentvolumes."""
 
     @base.queryapi(version='v1', kind='Pod')
     def pods(self, namespace=DEFAULT_NAMESPACE):
-        """Query pods."""
+        """:py:class:`~kubeshift.queries.base.Query` pods."""
 
     @base.queryapi(version='v1', kind='PodTemplate')
     def podtemplates(self, namespace=DEFAULT_NAMESPACE):
-        """Query podtemplates."""
+        """:py:class:`~kubeshift.queries.base.Query` podtemplates."""
 
     @base.queryapi(version='v1', kind='ReplicationController')
     def replicationcontrollers(self, namespace=DEFAULT_NAMESPACE):
-        """Query replicationcontrollers."""
+        """:py:class:`~kubeshift.queries.base.Query` replicationcontrollers."""
 
     @base.queryapi(version='v1', kind='ResourceQuota')
     def resourcequotas(self, namespace=DEFAULT_NAMESPACE):
-        """Query resourcequotas."""
+        """:py:class:`~kubeshift.queries.base.Query` resourcequotas."""
 
     @base.queryapi(version='v1', kind='Secret')
     def secrets(self, namespace=DEFAULT_NAMESPACE):
-        """Query secrets."""
+        """:py:class:`~kubeshift.queries.base.Query` secrets."""
 
     @base.queryapi(version='v1', kind='ServiceAccount')
     def serviceaccounts(self, namespace=DEFAULT_NAMESPACE):
-        """Query serviceaccounts."""
+        """:py:class:`~kubeshift.queries.base.Query` serviceaccounts."""
 
     @base.queryapi(version='v1', kind='Service')
     def services(self, namespace=DEFAULT_NAMESPACE):
-        """Query services."""
+        """:py:class:`~kubeshift.queries.base.Query` services."""
 
     # extensions/v1beta1
 
     @base.queryapi(version='extensions/v1beta1', kind='DaemonSet')
     def daemonsets(self, namespace=DEFAULT_NAMESPACE):
-        """Query daemonsets."""
+        """:py:class:`~kubeshift.queries.base.Query` daemonsets."""
 
     @base.queryapi(version='extensions/v1beta1', kind='Deployment')
     def deployments(self, namespace=DEFAULT_NAMESPACE):
-        """Query deployments."""
+        """:py:class:`~kubeshift.queries.base.Query` deployments."""
 
     @base.queryapi(version='extensions/v1beta1', kind='HorizontalPodAutoscaler')
     def horizontalpodautoscalers(self, namespace=DEFAULT_NAMESPACE):
-        """Query horizontalpodautoscalers."""
+        """:py:class:`~kubeshift.queries.base.Query` horizontalpodautoscalers."""
 
     @base.queryapi(version='extensions/v1beta1', kind='Ingress')
     def ingresses(self, namespace=DEFAULT_NAMESPACE):
-        """Query ingresses."""
+        """:py:class:`~kubeshift.queries.base.Query` ingresses."""
 
     @base.queryapi(version='extensions/v1beta1', kind='Job')
     def jobs(self, namespace=DEFAULT_NAMESPACE):
-        """Query jobs."""
+        """:py:class:`~kubeshift.queries.base.Query` jobs."""
 
     @base.queryapi(version='extensions/v1beta1', kind='NetworkPolicy')
     def networkpolicies(self, namespace=DEFAULT_NAMESPACE):
-        """Query networkpolicies."""
+        """:py:class:`~kubeshift.queries.base.Query` networkpolicies."""
 
     @base.queryapi(version='extensions/v1beta1', kind='ReplicaSet')
     def replicasets(self, namespace=DEFAULT_NAMESPACE):
-        """Query replicasets."""
+        """:py:class:`~kubeshift.queries.base.Query` replicasets."""
 
     @base.queryapi(version='extensions/v1beta1', kind='ThirdPartyResource', nsarg=False)
     def thirdpartyresources(self):
-        """Query thirdpartyresources."""
+        """:py:class:`~kubeshift.queries.base.Query` thirdpartyresources."""
 
     # apps/v1alpha1
 
     @base.queryapi(version='apps/v1alpha1', kind='PetSet')
     def petsets(self, namespace=DEFAULT_NAMESPACE):
-        """Query petsets."""
+        """:py:class:`~kubeshift.queries.base.Query` petsets."""
