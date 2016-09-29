@@ -6,6 +6,7 @@ import six
 from kubeshift.base import KubeBase
 from kubeshift.constants import (DEFAULT_NAMESPACE,
                                  LOGGER_DEFAULT)
+from kubeshift.queries.shift_query import ShiftQueryMixin
 from kubeshift import validator
 
 logger = logging.getLogger(LOGGER_DEFAULT)
@@ -30,7 +31,7 @@ def template(action):
     return decorator
 
 
-class OpenshiftClient(KubeBase):
+class OpenshiftClient(KubeBase, ShiftQueryMixin):
     """Openshift Provider client that provides access to APIs."""
 
     def __init__(self, *args, **kwargs):

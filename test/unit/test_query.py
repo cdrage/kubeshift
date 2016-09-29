@@ -4,7 +4,7 @@ from mock import patch
 
 from kubeshift.base import KubeBase
 from kubeshift.config import Config
-from kubeshift.query import Query
+from kubeshift.queries.base import Query
 
 import helper
 
@@ -26,7 +26,7 @@ class TestQuery(unittest.TestCase):
         self.addCleanup(patched_get_resources.stop)
         self.mock_resources = patched_get_resources.start()
 
-    def test_check_methods_exist(self):
+    def test_check_kube_methods_exist(self):
         client = KubeBase(self.config)
 
         apis = [

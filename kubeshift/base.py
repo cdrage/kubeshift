@@ -10,7 +10,7 @@ from kubeshift.config import Config
 from kubeshift.constants import (DEFAULT_NAMESPACE,
                                  LOGGER_DEFAULT)
 from kubeshift.exceptions import KubeConnectionError, KubeRequestError, KubeShiftError
-from kubeshift.query import QueryMixin
+from kubeshift.queries.kube_query import KubeQueryMixin
 from kubeshift import validator
 
 logger = logging.getLogger(LOGGER_DEFAULT)
@@ -202,7 +202,7 @@ class _ClientBase(object):
         return return_data
 
 
-class KubeBase(_ClientBase, QueryMixin):
+class KubeBase(_ClientBase, KubeQueryMixin):
     """Provide common base for each provider.
 
     The role of Kube Base is to parse the Kube Config file and create an

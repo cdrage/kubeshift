@@ -5,6 +5,7 @@ from mock import patch
 from kubeshift.openshift import OpenshiftClient
 from kubeshift.config import Config
 from kubeshift.exceptions import KubeRequestError
+from kubeshift.queries.base import Query
 
 import helper
 
@@ -79,3 +80,56 @@ class TestOpenshiftClient(unittest.TestCase):
                 client.scale({'apiVersion': 'v1', 'kind': 'DeploymentConfig', 'metadata': {'name': 'test'}}, replicas=2)
             except KubeRequestError:
                 self.fail('scale raised KubeRequestError unexpectedly')
+
+    def test_check_kube_methods_exist(self):
+        client = OpenshiftClient(self.config)
+
+        apis = [
+            'appliedclusterresourcequotas',
+            'buildconfigs',
+            'builds',
+            'clusternetworks',
+            'clusterpolicies',
+            'clusterpolicybindings',
+            'clusterresourcequotas',
+            'clusterrolebindings',
+            'clusterroles',
+            'deploymentconfigrollbacks',
+            'deploymentconfigs',
+            'egressnetworkpolicies',
+            'groups',
+            'hostsubnets',
+            'identities',
+            'images',
+            'imagesignatures',
+            'imagestreamimages',
+            'imagestreamimports',
+            'imagestreammappings',
+            'imagestreams',
+            'imagestreamtags',
+            'localresourceaccessreviews',
+            'localsubjectaccessreviews',
+            'netnamespaces',
+            'oauthaccesstokens',
+            'oauthauthorizetokens',
+            'oauthclientauthorizations',
+            'oauthclients',
+            'policies',
+            'policybindings',
+            'projectrequests',
+            'projects',
+            'resourceaccessreviews',
+            'rolebindings',
+            'roles',
+            'routes',
+            'selfsubjectrulesreviews',
+            'subjectaccessreviews',
+            'templates',
+            'useridentitymappings',
+            'users',
+        ]
+
+        for api in apis:
+            self.assertIsNotNone(getattr(client, api, None))
+            result = getattr(client, api)()
+            self.assertIsInstance(result, Query)
