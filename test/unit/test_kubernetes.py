@@ -57,3 +57,19 @@ class TestKubernetesClient(unittest.TestCase):
                 client.scale({'apiVersion': 'v1', 'kind': 'Pod', 'metadata': {'name': 'test'}}, replicas=2)
             except KubeRequestError:
                 self.fail('scale raised KubeRequestError unexpectedly')
+
+    def test_replace(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                client.replace({'apiVersion': 'v1', 'kind': 'Pod', 'metadata': {'name': 'test'}})
+            except KubeRequestError:
+                self.fail('replace raised KubeRequestError unexpectedly')
+
+    def test_modify(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                client.modify({'apiVersion': 'v1', 'kind': 'Pod', 'metadata': {'name': 'test'}})
+            except KubeRequestError:
+                self.fail('modify raised KubeRequestError unexpectedly')
