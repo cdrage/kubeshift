@@ -59,9 +59,11 @@ oc_client = kubeshift.OpenshiftClient(config)
 
 **The main methods for each provider are:**
 ```
-.create(object)
-.delete(object)
+.create(object, namespace="default")
+.delete(object, namespace="default")
 .scale(object, namespace="default", replicas=0)
+.replace(object, namespace="default")  # Replace a resource on the k8s cluster
+.modify(object, namespace="default") # Modify an existing object / resource
 ```
 
 API calls are also available via their corresponding method. Each call returns a dictionary object container all information. These methods are created from the list of calls at `http://localhost:8080/apis`. Some calls *require* namespace to be provided. Otherwise, 'default' will be used.
