@@ -163,7 +163,7 @@ class _ClientBase(object):
 
         return url
 
-    def request(self, method, url, data=None):
+    def request(self, method, url, data=None, headers=None):
         """
         Complete the request to the API and fails if the status_code is != 200/201.
 
@@ -174,10 +174,6 @@ class _ClientBase(object):
         """
         status_code = None
         return_data = None
-
-        headers = {}
-        if method.lower() == 'patch':
-            headers = {'Content-Type': 'application/json-patch+json'}
 
         try:
             res = self.session.request(method, url, headers=headers, json=data)
@@ -245,6 +241,35 @@ class KubeBase(_ClientBase, KubeQueryMixin):
 
         logger.info('%s `%s` successfully deleted', kind.capitalize(), name)
 
+    def replace(self, obj, namespace=DEFAULT_NAMESPACE):
+        """Replace a resource on the Kubernetes cluster."""
+        apiver, kind, name = validator.validate(obj)
+        namespace = validator.check_namespace(obj, namespace)
+        url = self._generate_url(apiver, kind, namespace, name)
+
+        self.request('put', url, data=obj)
+
+        logger.info('%s `%s` successfully replaced', kind.capitalize(), name)
+
+    def modify(self, partial, namespace=DEFAULT_NAMESPACE):
+        """Modify a resource.
+
+        The partial object provided will be strategically merged with the existing
+        resource content. The top level meta data is required to enable modifying
+        the correct resource instance.
+
+        :param dict partial: changes to be applied to existing resource content
+        :param str namespace: object name and auth scope, such as for teams and projects
+        """
+        apiver, kind, name = validator.validate(partial)
+        namespace = validator.check_namespace(partial, namespace)
+        url = self._generate_url(apiver, kind, namespace, name)
+
+        headers = {'Content-Type': 'application/strategic-merge-patch+json'}
+        self.request('patch', url, data=partial, headers=headers)
+
+        logger.info('%s `%s` successfully modified', kind.capitalize(), name)
+
     def scale(self, obj, namespace=DEFAULT_NAMESPACE, replicas=0):
         """
         Scale replicas up or down.
@@ -261,9 +286,10 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         namespace = validator.check_namespace(obj, namespace)
         url = self._generate_url(apiver, kind, namespace, name)
 
+        headers = {'Content-Type': 'application/json-patch+json'}
         patch = [{'op': 'replace',
                   'path': '/spec/replicas',
                   'value': replicas}]
-        self.request('patch', url, data=patch)
+        self.request('patch', url, data=patch, headers=headers)
 
         logger.info('`%s` successfully scaled to %s', name, replicas)
