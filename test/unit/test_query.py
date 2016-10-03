@@ -86,20 +86,32 @@ class TestQuery(unittest.TestCase):
             data = client.nodes().filter()
             self.assertEqual(data, [])
 
-    def test_filters_namespace(self):
-        client = KubeBase(self.config)
-        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
-            data = client.nodes().filter(namespace='default')
-            self.assertEqual(data, [])
-
     def test_filters_status(self):
         client = KubeBase(self.config)
         with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
             data = client.nodes().filter(status='Running')
             self.assertEqual(data, [])
 
-    def test_filters_both_inputs(self):
+    def test_by_selector_empty(self):
         client = KubeBase(self.config)
         with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
-            data = client.nodes().filter(namespace='default', status='Running')
+            data = client.nodes().by_selector(None)
             self.assertEqual(data, [])
+
+    def test_by_selector_simple(self):
+        client = KubeBase(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            data = client.nodes().by_selector([{'key': 'name'}])
+            self.assertEqual(data, [])
+
+    def test_by_name_no_inputs(self):
+        client = KubeBase(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            data = client.nodes().by_name(None)
+            self.assertEqual(data, {})
+
+    def test_by_name_simple(self):
+        client = KubeBase(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            data = client.nodes().by_name('test')
+            self.assertEqual(data, {})
