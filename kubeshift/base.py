@@ -1,10 +1,12 @@
 """Base class for providers."""
 import abc
 import logging
+import os
 
 import requests
 import six
 import six.moves.urllib.parse as urlparse
+import yaml
 
 from kubeshift.config import Config
 from kubeshift.constants import (DEFAULT_NAMESPACE,
@@ -205,6 +207,19 @@ class KubeBase(_ClientBase, KubeQueryMixin):
     Kubernetes-based APIs (OpenShift/Kubernetes).
     """
 
+    def _by_file(self, filepath, func):
+        if not os.path.isfile(filepath):
+            raise KubeShiftError('File not found: %s' % filepath)
+
+        with open(filepath, 'r') as fd:
+            resources = yaml.safe_load_all(fd.read())
+
+        results = []
+        for res in resources:
+            results.append(func(res))
+
+        return results
+
     def create(self, obj, namespace=DEFAULT_NAMESPACE):
         """Create an object from the Kubernetes cluster."""
         apiver, kind, name = validator.validate(obj)
@@ -216,6 +231,16 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         logger.info('%s `%s` successfully created', kind.capitalize(), name)
 
         return resp
+
+    def create_by_file(self, filepath):
+        """Create resource by file.
+
+        :params str filepath: file location
+        :returns: created resource(s)
+        :rtype: list
+        :raises kubeshift.exceptions.KubeShiftError: if file not found
+        """
+        return self._by_file(filepath, self.create)
 
     def delete(self, obj, namespace=DEFAULT_NAMESPACE):
         """Delete an object from the Kubernetes cluster.
@@ -242,6 +267,16 @@ class KubeBase(_ClientBase, KubeQueryMixin):
 
         return resp
 
+    def delete_by_file(self, filepath):
+        """Delete resource by file.
+
+        :params str filepath: file location
+        :returns: deleted resource(s)
+        :rtype: list
+        :raises kubeshift.exceptions.KubeShiftError: if file not found
+        """
+        return self._by_file(filepath, self.delete)
+
     def replace(self, obj, namespace=DEFAULT_NAMESPACE):
         """Replace a resource on the Kubernetes cluster."""
         apiver, kind, name = validator.validate(obj)
@@ -253,6 +288,16 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         logger.info('%s `%s` successfully replaced', kind.capitalize(), name)
 
         return resp
+
+    def replace_by_file(self, filepath):
+        """Replace resource by file.
+
+        :params str filepath: file location
+        :returns: replaced resource(s)
+        :rtype: list
+        :raises kubeshift.exceptions.KubeShiftError: if file not found
+        """
+        return self._by_file(filepath, self.replace)
 
     def modify(self, partial, namespace=DEFAULT_NAMESPACE):
         """Modify a resource.
@@ -274,6 +319,16 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         logger.info('%s `%s` successfully modified', kind.capitalize(), name)
 
         return resp
+
+    def modify_by_file(self, filepath):
+        """Modify resource by file.
+
+        :params str filepath: file location
+        :returns: modified resource(s)
+        :rtype: list
+        :raises kubeshift.exceptions.KubeShiftError: if file not found
+        """
+        return self._by_file(filepath, self.modify)
 
     def scale(self, obj, namespace=DEFAULT_NAMESPACE, replicas=0):
         """Scale replicas up or down.
