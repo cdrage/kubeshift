@@ -15,12 +15,20 @@ def _get_requirements(path):
 
 
 def _install_requirements():
-    requirements = _get_requirements('requirements.txt')
-    return requirements
+    return _get_requirements('requirements.txt')
+
+
+with open('kubeshift/__init__.py', 'r') as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        fd.read(), re.MULTILINE).group(1)
+
+if not version:
+    raise RuntimeError('Cannot find version information')
+
 
 setup(
     name='kubeshift',
-    version='0.0.4',
+    version=version,
     description='A universal python library for container orchestrators',
     author='cdrage',
     author_email='cdrage@redhat.com',

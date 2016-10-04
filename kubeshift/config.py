@@ -117,7 +117,10 @@ class Config(object):
         return self.users.get(self.context.get('user', ''), {})
 
     def set_current_context(self, ctx_key):
-        """Set the current-context in a kubeconfig file."""
+        """Set the current-context in a kubeconfig file.
+
+        :param str ctx_key: name of the context to use as the current-context
+        """
         if not ctx_key and len(self.contexts) == 1:
             ctx_key = list(self.contexts.keys())[0]
 
@@ -144,7 +147,6 @@ class Config(object):
         :param bool embed_certs: embed-certs for the cluster entry in kubeconfig (default: False)
         :param bool skip_verify: insecure-skip-tls-verify for the cluster entry in kubeconfig (default: False)
         :param str api_version: api-version for the cluster entry in kubeconfig
-
         """
         if api_version:
             self.content['apiVersion'] = api_version
@@ -177,7 +179,6 @@ class Config(object):
         :param str client_cert: path to client-certificate file for the user entry in kubeconfig
         :param str client_key: path to client-key file for the user entry in kubeconfig
         :param bool embed_certs: embed client cert/key for the user entry in kubeconfig (default: False)
-
         """
         data = {}
 
@@ -327,9 +328,8 @@ class Config(object):
         """Load a file from disk.
 
         :param str filepath: File location
-
-        :returns: Config(obj): An object representing the contents of file
-
+        :returns: A Config instance representing the .kube/config file
+        :rtype: :py:class:`~kubeshift.config.Config`
         """
         if not filepath:
             filepath = DEFAULT_FILE
@@ -348,16 +348,15 @@ class Config(object):
         """
         Create a .kube/config configuration as an object based upon the arguments given.
 
-        Params:
-            api(str): API URL of the server
-            auth(str|dict): Authentication key for the server
-            ca(str): The certificate being used. This can be either a file location or a base64 encoded string
-            verify(bool): true/false of whether or not certificate verification is enabled
-            filepath(str): File location
-
-        Returns:
-            config(obj): An object file of generate .kube/config
-
+        :param str context_name: name of context to use for current-context
+        :param str api: API URL of the server
+        :param str username: name of user entry
+        :param str|dict auth: Authentication key for the server
+        :param str ca: file location ca certificate for server
+        :param bool verify: true/false of whether or not certificate verification is enabled
+        :param str filepath: kubeconfig file location to use or as to be saved to
+        :returns: A Config instance representing the .kube/config file
+        :rtype: :py:class:`~kubeshift.config.Config`
         """
         cfg = cls.from_file(filepath)
 

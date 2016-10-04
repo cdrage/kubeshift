@@ -4,7 +4,7 @@
 
 ## Introduction
 
-_Kubeshift_ is a multi-provider Python library for Kubernetes (Kube) and Openshift (shift). We connect and communicate with each container orchestator 100% through their TLS (if available) HTTP API.
+_Kubeshift_ is a multi-provider Python library for Kubernetes (kube) and Openshift (shift). We connect and communicate with each container orchestator 100% through their TLS (if available) HTTP API.
 
 __Features:__
 
@@ -17,25 +17,30 @@ __Features:__
 ## Library installation
 
 #### Pip
-```
+```bash
 sudo pip install kubeshift
 ```
 
 #### Manual / development
-```
+```bash
 git clone https://github.com/cdrage/kubeshift && cd kubeshift
 make install
 ```
 
-## Python requirements
+#### Python requirements
 
-```sh
-▶ cat requirements.txt 
-anymarkup
+```bash
+▶ cat requirements.txt
+PyYAML
 requests
 ```
 
-## Methods and examples
+Public APIs
+-----------
+* [Config](config.md)
+* [Query](query.md)
+* [KubernetesClient](kube.md)
+* [OpenshiftClient](shift.md)
 
 #### Configuration import
 
@@ -55,59 +60,15 @@ k8s_client = kubeshift.KubernetesClient(config)
 oc_client = kubeshift.OpenshiftClient(config)
 ```
 
-#### Implemented methods
+#### Named Query methods
 
-**The main methods for each provider are:**
-```
-.create(object, namespace="default")
-.delete(object, namespace="default")
-.scale(object, namespace="default", replicas=0)
-.replace(object, namespace="default")  # Replace a resource on the k8s cluster
-.modify(object, namespace="default") # Modify an existing object / resource
-```
+API calls are also available via their corresponding method. Each call returns a `Query` object used to retrieve and filter.
 
-API calls are also available via their corresponding method. Each call returns a dictionary object container all information. These methods are created from the list of calls at `http://localhost:8080/apis`. Some calls *require* namespace to be provided. Otherwise, 'default' will be used.
+**Methods Sourced through discovery**
 
-**API call methods:**
-```
-.componentstatuses
-.namespaces
-.nodes
-.persistentvolumes
-.thirdpartyresources
-```
+- `http://localhost:8080/apis`
+- `http://localhost:8080/oapi`
 
-**Namespaced API call methods:**
-```
-.configmaps(namespace="default")
-.endpoints(namespace="default")
-.events(namespace="default")
-.limitranges(namespace="default")
-.persistentvolumeclaims(namespace="default")
-.pods(namespace="default")
-.podtemplates(namespace="default")
-.resourcequotas(namespace="default")
-.secrets(namespace="default")
-.serviceaccounts(namespace="default")
-.services(namespace="default")
-.daemonsets(namespace="default")
-.deployments(namespace="default")
-.horizontalpodautoscalers(namespace="default")
-.ingresses(namespace="default")
-.jobs(namespace="default")
-.networkpolicies(namespace="default")
-.replicasets(namespace="default")
-.petsets(namespace="default")
-.poddisruptionbudgets(namespace="default")
-```
-
-**These API calls can further be filtered via these methods:**
-```
-.filter(namespace="foo", status="Running")
-.all()
-.metadata()
-.items()
-```
 
 **Full example:**
 ```python
@@ -139,3 +100,4 @@ client.pods().filter(namespace="default", status="Running")
 client.pods().metadata()
 client.pods().items()
 ```
+
