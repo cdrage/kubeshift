@@ -1,12 +1,15 @@
+import os
 import unittest
 
 from mock import patch
 
 from kubeshift.kubernetes import KubernetesClient
 from kubeshift.config import Config
-from kubeshift.exceptions import KubeRequestError
+from kubeshift.exceptions import KubeRequestError, KubeShiftError
 
 import helper
+
+FIXTURE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures')
 
 
 class TestKubernetesClient(unittest.TestCase):
@@ -73,3 +76,91 @@ class TestKubernetesClient(unittest.TestCase):
                 client.modify({'apiVersion': 'v1', 'kind': 'Pod', 'metadata': {'name': 'test'}})
             except KubeRequestError:
                 self.fail('modify raised KubeRequestError unexpectedly')
+
+    def test_create_by_file_error(self):
+        client = KubernetesClient(self.config)
+        with self.assertRaises(KubeShiftError):
+            client.create_by_file(os.path.join(FIXTURE_DIR, 'yaml', 'fake-file.yaml'))
+
+    def test_create_by_file_json(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                resp = client.create_by_file(os.path.join(FIXTURE_DIR, 'json', 'redis-master.json'))
+                self.assertIsInstance(resp, list)
+                self.assertEqual(len(resp), 1)
+            except KubeRequestError:
+                self.fail('create raised KubeRequestError unexpectedly')
+
+    def test_create_by_file_yaml(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                resp = client.create_by_file(os.path.join(FIXTURE_DIR, 'yaml', 'es-rc.yaml'))
+                self.assertIsInstance(resp, list)
+                self.assertEqual(len(resp), 2)
+            except KubeRequestError:
+                self.fail('create raised KubeRequestError unexpectedly')
+
+    def test_replace_by_file_error(self):
+        client = KubernetesClient(self.config)
+        with self.assertRaises(KubeShiftError):
+            client.replace_by_file(os.path.join(FIXTURE_DIR, 'yaml', 'fake-file.yaml'))
+
+    def test_replace_by_file_json(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                client.replace_by_file(os.path.join(FIXTURE_DIR, 'json', 'redis-slave-service.json'))
+            except KubeRequestError:
+                self.fail('create raised KubeRequestError unexpectedly')
+
+    def test_replace_by_file_yaml(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                client.replace_by_file(os.path.join(FIXTURE_DIR, 'yaml', 'service-account.yaml'))
+            except KubeRequestError:
+                self.fail('create raised KubeRequestError unexpectedly')
+
+    def test_modify_by_file_error(self):
+        client = KubernetesClient(self.config)
+        with self.assertRaises(KubeShiftError):
+            client.modify_by_file(os.path.join(FIXTURE_DIR, 'yaml', 'fake-file.yaml'))
+
+    def test_modify_by_file_json(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                client.modify_by_file(os.path.join(FIXTURE_DIR, 'json', 'redis-slave-service.json'))
+            except KubeRequestError:
+                self.fail('create raised KubeRequestError unexpectedly')
+
+    def test_modify_by_file_yaml(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                client.modify_by_file(os.path.join(FIXTURE_DIR, 'yaml', 'service-account.yaml'))
+            except KubeRequestError:
+                self.fail('create raised KubeRequestError unexpectedly')
+
+    def test_delete_by_file_error(self):
+        client = KubernetesClient(self.config)
+        with self.assertRaises(KubeShiftError):
+            client.delete_by_file(os.path.join(FIXTURE_DIR, 'yaml', 'fake-file.yaml'))
+
+    def test_delete_by_file_json(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                client.delete_by_file(os.path.join(FIXTURE_DIR, 'json', 'redis-slave-service.json'))
+            except KubeRequestError:
+                self.fail('create raised KubeRequestError unexpectedly')
+
+    def test_delete_by_file_yaml(self):
+        client = KubernetesClient(self.config)
+        with patch.object(client.session, 'request', return_value=helper.make_response(200, {})):
+            try:
+                client.delete_by_file(os.path.join(FIXTURE_DIR, 'yaml', 'service-account.yaml'))
+            except KubeRequestError:
+                self.fail('create raised KubeRequestError unexpectedly')
