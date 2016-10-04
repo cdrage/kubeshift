@@ -24,9 +24,9 @@ def template(action):
         def handler(self, obj, namespace=None):
             apiver, kind, _ = validator.validate(obj)
             if kind == 'Template':
-                self._process_template(apiver, kind, action, obj, namespace)
+                return self._process_template(apiver, kind, action, obj, namespace)
             else:
-                func(self, obj, namespace)
+                return func(self, obj, namespace)
         return handler
     return decorator
 
@@ -44,12 +44,12 @@ class OpenshiftClient(KubeBase, ShiftQueryMixin):
     @template(action='post')
     def create(self, obj, namespace=DEFAULT_NAMESPACE):
         """Create an object from the Openshift cluster."""
-        super(OpenshiftClient, self).create(obj, namespace)
+        return super(OpenshiftClient, self).create(obj, namespace)
 
     @template(action='delete')
     def delete(self, obj, namespace=DEFAULT_NAMESPACE):
         """Delete an object from the Openshift cluster."""
-        super(OpenshiftClient, self).delete(obj, namespace)
+        return super(OpenshiftClient, self).delete(obj, namespace)
 
     def _process_template(self, apiver, kind, method, obj, namespace):
         url = self._generate_url(apiver, kind, namespace)
@@ -63,3 +63,4 @@ class OpenshiftClient(KubeBase, ShiftQueryMixin):
 
         logger.debug('Processed template with %d objects successfully',
                      len(data.get('objects', [])))
+        return data

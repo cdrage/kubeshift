@@ -212,9 +212,11 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         namespace = validator.check_namespace(obj, namespace)
         url = self._generate_url(apiver, kind, namespace)
 
-        self.request('post', url, data=obj)
+        resp = self.request('post', url, data=obj)
 
         logger.info('%s `%s` successfully created', kind.capitalize(), name)
+
+        return resp
 
     def delete(self, obj, namespace=DEFAULT_NAMESPACE):
         """
@@ -237,9 +239,11 @@ class KubeBase(_ClientBase, KubeQueryMixin):
 
         if kind in ['ReplicationController']:
             self.scale(obj, namespace)
-        self.request('delete', url)
+        resp = self.request('delete', url)
 
         logger.info('%s `%s` successfully deleted', kind.capitalize(), name)
+
+        return resp
 
     def replace(self, obj, namespace=DEFAULT_NAMESPACE):
         """Replace a resource on the Kubernetes cluster."""
@@ -247,9 +251,11 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         namespace = validator.check_namespace(obj, namespace)
         url = self._generate_url(apiver, kind, namespace, name)
 
-        self.request('put', url, data=obj)
+        resp = self.request('put', url, data=obj)
 
         logger.info('%s `%s` successfully replaced', kind.capitalize(), name)
+
+        return resp
 
     def modify(self, partial, namespace=DEFAULT_NAMESPACE):
         """Modify a resource.
@@ -266,9 +272,11 @@ class KubeBase(_ClientBase, KubeQueryMixin):
         url = self._generate_url(apiver, kind, namespace, name)
 
         headers = {'Content-Type': 'application/strategic-merge-patch+json'}
-        self.request('patch', url, data=partial, headers=headers)
+        resp = self.request('patch', url, data=partial, headers=headers)
 
         logger.info('%s `%s` successfully modified', kind.capitalize(), name)
+
+        return resp
 
     def scale(self, obj, namespace=DEFAULT_NAMESPACE, replicas=0):
         """
