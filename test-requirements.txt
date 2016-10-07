@@ -4,5 +4,3 @@ pep8
 pytest
 pytest-cov
 coveralls
-Sphinx
-recommonmark
