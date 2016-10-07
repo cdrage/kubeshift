@@ -1,13 +1,14 @@
-language: python
-sudo: required
-services:
-  - docker
-
 matrix:
   include:
   - python: "2.7"
+    services: docker
+    sudo: required
   - python: "3.4"
+    services: docker
+    sudo: required
   - python: "3.5"
+    services: docker
+    sudo: required
     env: BUILD_DOCS=yes
 
 before_install:
