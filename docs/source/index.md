@@ -35,13 +35,6 @@ PyYAML
 requests
 ```
 
-Public APIs
------------
-* [Config](config.md)
-* [Query](query.md)
-* [KubernetesClient](kube.md)
-* [OpenshiftClient](shift.md)
-
 #### Configuration import
 
 The configuration file used with the provider must be an _object_. Currently we support the import and generation of Kubernetes and OpenShift configuration files .
