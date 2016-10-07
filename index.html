@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  
+  <link rel="shortcut icon" href="./img/favicon.ico">
+  <title>Home - Kubeshift</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = "/";
+  </script>
+  
+  <script src="./js/jquery-2.1.1.min.js"></script>
+  <script src="./js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> Kubeshift</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href=".">Home</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#kubeshift">Kubeshift</a></li>
+                
+                    <li><a class="toctree-l4" href="#introduction">Introduction</a></li>
+                
+                    <li><a class="toctree-l4" href="#library-installation">Library installation</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">Kubeshift</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="kubeshift">Kubeshift</h1>
+<p><a href="https://travis-ci.org/cdrage/kubeshift"><img alt="Build Status" src="https://travis-ci.org/cdrage/kubeshift.svg?branch=master" /></a>
+<a href="https://coveralls.io/github/cdrage/kubeshift?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/cdrage/kubeshift/badge.svg?branch=master" /></a></p>
+<h2 id="introduction">Introduction</h2>
+<p><em>Kubeshift</em> is a multi-provider Python library for Kubernetes (kube) and Openshift (shift). We connect and communicate with each container orchestator 100% through their TLS (if available) HTTP API.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>100% HTTP API</li>
+<li>Auto-parsing of <code>~/.kube/config</code></li>
+<li><code>.kube/config</code> generation</li>
+<li>TLS authentication</li>
+<li>100% test coverage with functional and integration tests</li>
+</ul>
+<h2 id="library-installation">Library installation</h2>
+<h4 id="pip">Pip</h4>
+<pre><code class="bash">sudo pip install kubeshift
+</code></pre>
+
+<h4 id="manual-development">Manual / development</h4>
+<pre><code class="bash">git clone https://github.com/cdrage/kubeshift &amp;&amp; cd kubeshift
+make install
+</code></pre>
+
+<h4 id="python-requirements">Python requirements</h4>
+<pre><code class="bash">▶ cat requirements.txt
+PyYAML
+requests
+</code></pre>
+
+<h4 id="configuration-import">Configuration import</h4>
+<p>The configuration file used with the provider must be an <em>object</em>. Currently we support the import and generation of Kubernetes and OpenShift configuration files .</p>
+<pre><code class="python">import kubeshift
+
+# Import the configuration, this can be either from a file
+config = kubeshift.Config.from_file(&quot;/home/user/.kube/config&quot;)
+
+# Or generated via a set of parameters
+config_params = kubeshift.Config.from_params(context_name=&quot;default&quot;, username=&quot;default&quot;, api=&quot;https://localhost:8080&quot;, auth=&quot;foobar&quot;, ca=&quot;/home/user/.kube/ca.cert&quot;, verify=True, filepath=None)
+
+# Client connection
+k8s_client = kubeshift.KubernetesClient(config)
+oc_client = kubeshift.OpenshiftClient(config)
+</code></pre>
+
+<h4 id="named-query-methods">Named Query methods</h4>
+<p>API calls are also available via their corresponding method. Each call returns a <code>Query</code> object used to retrieve and filter.</p>
+<p><strong>Methods Sourced through discovery</strong></p>
+<ul>
+<li><code>http://localhost:8080/apis</code></li>
+<li><code>http://localhost:8080/oapi</code></li>
+</ul>
+<p><strong>Full example:</strong></p>
+<pre><code class="python">import kubeshift
+import getpass
+
+# Example k8s object
+k8s_object = {&quot;apiVersion&quot;: &quot;v1&quot;, &quot;kind&quot;: &quot;Pod&quot;, &quot;metadata&quot;: {&quot;labels&quot;: {&quot;app&quot;: &quot;hellonginx&quot;}, &quot;name&quot;: &quot;hellonginx&quot;}, &quot;spec&quot;: {
+    &quot;containers&quot;: [{&quot;image&quot;: &quot;nginx&quot;, &quot;name&quot;: &quot;hellonginx&quot;, &quot;ports&quot;: [{&quot;containerPort&quot;: 80, &quot;hostPort&quot;: 80, &quot;protocol&quot;: &quot;TCP&quot;}]}]}}
+
+# Client configuration
+user = getpass.getuser()
+config = kubeshift.Config.from_file(&quot;/home/%s/.kube/config&quot; % user)
+client = kubeshift.KubernetesClient(config)
+
+# Main methods
+client.create(k8s_object)  # Creates the k8s object
+# client.scale(k8s_object, replicas=3) # Scales the k8s object (if it's a service)
+client.delete(k8s_object)  # Deletes the k8s object
+
+# API calls
+
+# Namespaces
+client.namespaces().all()
+
+# Pods
+client.pods().all()
+client.pods().filter(namespace=&quot;default&quot;, status=&quot;Running&quot;)
+client.pods().metadata()
+client.pods().items()
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script src="./js/theme.js"></script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 0.15.3
+Build Date UTC : 2016-10-07 16:16:39
+-->

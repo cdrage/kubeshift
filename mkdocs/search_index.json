@@ -1,0 +1,49 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "Kubeshift\n\n\n\n\n\n\nIntroduction\n\n\nKubeshift\n is a multi-provider Python library for Kubernetes (kube) and Openshift (shift). We connect and communicate with each container orchestator 100% through their TLS (if available) HTTP API.\n\n\nFeatures:\n\n\n\n\n100% HTTP API\n\n\nAuto-parsing of \n~/.kube/config\n\n\n.kube/config\n generation\n\n\nTLS authentication\n\n\n100% test coverage with functional and integration tests\n\n\n\n\nLibrary installation\n\n\nPip\n\n\nsudo pip install kubeshift\n\n\n\n\nManual / development\n\n\ngit clone https://github.com/cdrage/kubeshift \n cd kubeshift\nmake install\n\n\n\n\nPython requirements\n\n\n\u25b6 cat requirements.txt\nPyYAML\nrequests\n\n\n\n\nConfiguration import\n\n\nThe configuration file used with the provider must be an \nobject\n. Currently we support the import and generation of Kubernetes and OpenShift configuration files .\n\n\nimport kubeshift\n\n# Import the configuration, this can be either from a file\nconfig = kubeshift.Config.from_file(\n/home/user/.kube/config\n)\n\n# Or generated via a set of parameters\nconfig_params = kubeshift.Config.from_params(context_name=\ndefault\n, username=\ndefault\n, api=\nhttps://localhost:8080\n, auth=\nfoobar\n, ca=\n/home/user/.kube/ca.cert\n, verify=True, filepath=None)\n\n# Client connection\nk8s_client = kubeshift.KubernetesClient(config)\noc_client = kubeshift.OpenshiftClient(config)\n\n\n\n\nNamed Query methods\n\n\nAPI calls are also available via their corresponding method. Each call returns a \nQuery\n object used to retrieve and filter.\n\n\nMethods Sourced through discovery\n\n\n\n\nhttp://localhost:8080/apis\n\n\nhttp://localhost:8080/oapi\n\n\n\n\nFull example:\n\n\nimport kubeshift\nimport getpass\n\n# Example k8s object\nk8s_object = {\napiVersion\n: \nv1\n, \nkind\n: \nPod\n, \nmetadata\n: {\nlabels\n: {\napp\n: \nhellonginx\n}, \nname\n: \nhellonginx\n}, \nspec\n: {\n    \ncontainers\n: [{\nimage\n: \nnginx\n, \nname\n: \nhellonginx\n, \nports\n: [{\ncontainerPort\n: 80, \nhostPort\n: 80, \nprotocol\n: \nTCP\n}]}]}}\n\n# Client configuration\nuser = getpass.getuser()\nconfig = kubeshift.Config.from_file(\n/home/%s/.kube/config\n % user)\nclient = kubeshift.KubernetesClient(config)\n\n# Main methods\nclient.create(k8s_object)  # Creates the k8s object\n# client.scale(k8s_object, replicas=3) # Scales the k8s object (if it's a service)\nclient.delete(k8s_object)  # Deletes the k8s object\n\n# API calls\n\n# Namespaces\nclient.namespaces().all()\n\n# Pods\nclient.pods().all()\nclient.pods().filter(namespace=\ndefault\n, status=\nRunning\n)\nclient.pods().metadata()\nclient.pods().items()", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/#kubeshift", 
+            "text": "", 
+            "title": "Kubeshift"
+        }, 
+        {
+            "location": "/#introduction", 
+            "text": "Kubeshift  is a multi-provider Python library for Kubernetes (kube) and Openshift (shift). We connect and communicate with each container orchestator 100% through their TLS (if available) HTTP API.  Features:   100% HTTP API  Auto-parsing of  ~/.kube/config  .kube/config  generation  TLS authentication  100% test coverage with functional and integration tests", 
+            "title": "Introduction"
+        }, 
+        {
+            "location": "/#library-installation", 
+            "text": "", 
+            "title": "Library installation"
+        }, 
+        {
+            "location": "/#pip", 
+            "text": "sudo pip install kubeshift", 
+            "title": "Pip"
+        }, 
+        {
+            "location": "/#manual-development", 
+            "text": "git clone https://github.com/cdrage/kubeshift   cd kubeshift\nmake install", 
+            "title": "Manual / development"
+        }, 
+        {
+            "location": "/#python-requirements", 
+            "text": "\u25b6 cat requirements.txt\nPyYAML\nrequests", 
+            "title": "Python requirements"
+        }, 
+        {
+            "location": "/#configuration-import", 
+            "text": "The configuration file used with the provider must be an  object . Currently we support the import and generation of Kubernetes and OpenShift configuration files .  import kubeshift\n\n# Import the configuration, this can be either from a file\nconfig = kubeshift.Config.from_file( /home/user/.kube/config )\n\n# Or generated via a set of parameters\nconfig_params = kubeshift.Config.from_params(context_name= default , username= default , api= https://localhost:8080 , auth= foobar , ca= /home/user/.kube/ca.cert , verify=True, filepath=None)\n\n# Client connection\nk8s_client = kubeshift.KubernetesClient(config)\noc_client = kubeshift.OpenshiftClient(config)", 
+            "title": "Configuration import"
+        }, 
+        {
+            "location": "/#named-query-methods", 
+            "text": "API calls are also available via their corresponding method. Each call returns a  Query  object used to retrieve and filter.  Methods Sourced through discovery   http://localhost:8080/apis  http://localhost:8080/oapi   Full example:  import kubeshift\nimport getpass\n\n# Example k8s object\nk8s_object = { apiVersion :  v1 ,  kind :  Pod ,  metadata : { labels : { app :  hellonginx },  name :  hellonginx },  spec : {\n     containers : [{ image :  nginx ,  name :  hellonginx ,  ports : [{ containerPort : 80,  hostPort : 80,  protocol :  TCP }]}]}}\n\n# Client configuration\nuser = getpass.getuser()\nconfig = kubeshift.Config.from_file( /home/%s/.kube/config  % user)\nclient = kubeshift.KubernetesClient(config)\n\n# Main methods\nclient.create(k8s_object)  # Creates the k8s object\n# client.scale(k8s_object, replicas=3) # Scales the k8s object (if it's a service)\nclient.delete(k8s_object)  # Deletes the k8s object\n\n# API calls\n\n# Namespaces\nclient.namespaces().all()\n\n# Pods\nclient.pods().all()\nclient.pods().filter(namespace= default , status= Running )\nclient.pods().metadata()\nclient.pods().items()", 
+            "title": "Named Query methods"
+        }
+    ]
+}
