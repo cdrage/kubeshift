@@ -1,0 +1,3 @@
+site_name: Kubeshift
+docs_dir: source
+theme: readthedocs
