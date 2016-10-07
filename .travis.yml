@@ -3,10 +3,12 @@ sudo: required
 services:
   - docker
 
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
+matrix:
+  include:
+  - python: "2.7"
+  - python: "3.4"
+  - python: "3.5"
+    env: BUILD_DOCS=yes
 
 before_install:
   # kubectl
@@ -27,6 +29,7 @@ script:
   # run tests
   - make test
   - make integration-test
+  - bash script/pushdocs.sh
 
 after_success:
   - sudo coveralls
