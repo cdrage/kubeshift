@@ -4,17 +4,14 @@ if [ "$TRAVIS_BRANCH" != "master" ] || [ "$BUILD_DOCS" != "yes" ] || [ "$TRAVIS_
     exit 0
 fi
 
+
+DOCS_GIT_REPO="github.com/cdrage/kubeshift.git"
+
 # Install dev version of mkdocs
 pip install -U git+https://github.com/mkdocs/mkdocs.git
 
-DOCS_REPO_NAME="kubeshift"
-DOCS_REPO_URL="git@github.com:cdrage/kubeshift"
-DOCS_GIT_REPO="github.com/cdrage/kubeshift.git"
+# Change to the "docs" folder
+cd docs
 
-# clone the repo
-git clone "$DOCS_REPO_URL" "$DOCS_REPO_NAME"
-
-# cd to the docs folder
-cd $DOCS_REPO_NAME/docs
-
-mkdocs gh-deploy --clean --force --remote-name https://{$GITHUB_API_KEY}@{$DOCS_GIT_REPO}
+# Push to the "gh-pages" branch
+mkdocs gh-deploy --clean --force --remote-name https://$GITHUB_API_KEY@$DOCS_GIT_REPO
